@@ -1,0 +1,15 @@
+pipeline{
+    agent any
+    stages {
+        stage ('clone'){
+            steps{
+                git branch: 'main', url: 'https://github.com/AVINASH34/saleor-dashboard.git'
+            }
+        }
+        stage ('docker'){
+            steps{
+                
+            }
+        }
+    }
+}
