@@ -5,7 +5,7 @@ WORKDIR /temp
 RUN npm install 
 
 
-FROM gcr.io/distroless/nodejs20-debian12 as final
+FROM gcr.io/distroless/nodejs18-debian12 as final
 COPY --from=build /temp /temp
 WORKDIR /temp
 EXPOSE 9000
