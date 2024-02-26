@@ -1,12 +1,18 @@
+# Build stage
 FROM node:18.19.1-slim as build
-RUN mkdir /temp
+WORKDIR /temp
+COPY package.json package-lock.json /temp/
+RUN npm install
+
+# Copy only application code
 COPY . /temp
-WORKDIR /temp
-RUN npm install 
 
-
+# Final stage
 FROM gcr.io/distroless/nodejs18-debian12 as final
-COPY --from=build /temp /temp
-WORKDIR /temp
+WORKDIR /app
+
+# Copy only necessary files from the build stage
+COPY --from=build /temp /app
+
 EXPOSE 9000
-CMD [ "npm" , "run" , "dev" ]
+CMD ["npm", "run", "dev"]
