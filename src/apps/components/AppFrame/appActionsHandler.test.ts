@@ -6,6 +6,27 @@ import { renderHook } from "@testing-library/react-hooks";
 import * as ReactIntl from "react-intl";
 import { IntlShape } from "react-intl";
 
+jest.mock("@dashboard/config", () => {
+  const actualModule = jest.requireActual("@dashboard/config");
+  return {
+    __esModule: true,
+    ...actualModule,
+  };
+});
+
+jest.mock(
+  "@dashboard/apps/components/ExternalAppContext/ExternalAppContext",
+  () => {
+    const actualModule = jest.requireActual(
+      "@dashboard/apps/components/ExternalAppContext/ExternalAppContext",
+    );
+    return {
+      __esModule: true,
+      ...actualModule,
+    };
+  },
+);
+
 const mockNotify = jest.fn();
 const mockCloseExternalApp = jest.fn();
 
@@ -23,10 +44,11 @@ jest.spyOn(ExternalAppContext, "useExternalApp").mockImplementation(() => ({
 
 jest
   .spyOn(dashboardConfig, "getAppMountUri")
-  .mockImplementation(() => "http://localhost:3000");
+  // getAppMountUri is not an URI, it's a pathname
+  .mockImplementation(() => "/dashboard/");
 
 jest.spyOn(ReactIntl, "useIntl").mockImplementation(
-  // @ts-ignore - only mock required method
+  // @ts-expect-error - only mock required method
   (): Pick<IntlShape, "formatMessage"> => ({
     formatMessage: jest.fn(),
   }),
@@ -49,8 +71,8 @@ describe("AppActionsHandler", function () {
    * @see https://wildwolf.name/jest-how-to-mock-window-location-href/
    */
   beforeEach((): void => {
-    delete window.location;
-    // @ts-ignore
+    delete (window as { location?: unknown }).location;
+    // @ts-expect-error
     window.location = {
       href: "http://localhost:3000",
       hostname: "localhost",
@@ -114,7 +136,7 @@ describe("AppActionsHandler", function () {
       expect(mockHistoryPushState).toHaveBeenCalledWith(
         null,
         "",
-        "http://localhost:3000/apps/XYZ/app/foo/bar",
+        "/dashboard/apps/XYZ/app/foo/bar",
       );
     });
   });
@@ -160,9 +182,7 @@ describe("AppActionsHandler", function () {
         });
 
         expect(mockWindowOpen).toHaveBeenCalledTimes(1);
-        expect(mockWindowOpen).toHaveBeenCalledWith(
-          "http://localhost:3000/orders",
-        );
+        expect(mockWindowOpen).toHaveBeenCalledWith("/dashboard/orders");
       });
 
       /**
@@ -182,7 +202,7 @@ describe("AppActionsHandler", function () {
 
         expect(mockWindowOpen).toHaveBeenCalledTimes(1);
         expect(mockWindowOpen).toHaveBeenCalledWith(
-          "http://localhost:3000/apps/XYZ/app/config",
+          "/dashboard/apps/XYZ/app/config",
         );
       });
     });
@@ -242,9 +262,31 @@ describe("AppActionsHandler", function () {
         expect(mockHistoryPushState).toHaveBeenCalledWith(
           null,
           "",
-          "http://localhost:3000/apps/XYZ/app/config",
+          "/dashboard/apps/XYZ/app/config",
         );
       });
+    });
+  });
+
+  describe("useHandlePermissionRequest", () => {
+    it("Redirects to a dedicated page with params from action", () => {
+      const hookRenderResult = renderHook(() =>
+        AppActionsHandler.useHandlePermissionRequest("XYZ"),
+      );
+
+      hookRenderResult.result.current.handle({
+        type: "requestPermissions",
+        payload: {
+          actionId: "123",
+          permissions: ["MANAGE_ORDERS", "MANAGE_CHANNELS"],
+          redirectPath: "/permissions-result",
+        },
+      });
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/apps/XYZ/permissions?redirectPath=%2Fpermissions-result&requestedPermissions=MANAGE_ORDERS%2CMANAGE_CHANNELS",
+      );
     });
   });
 });

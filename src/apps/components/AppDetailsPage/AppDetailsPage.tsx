@@ -1,16 +1,18 @@
-import CardSpacer from "@dashboard/components/CardSpacer";
 import { AppQuery } from "@dashboard/graphql";
+import errorTracker from "@dashboard/services/errorTracking";
+import { Box, Text } from "@saleor/macaw-ui-next";
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
-import AboutCard from "./AboutCard";
-import DataPrivacyCard from "./DataPrivacyCard";
+import { AppWebhooksDisplay } from "../AppWebhooksDisplay/AppWebhooksDisplay";
+import { AboutCard } from "./AboutCard";
+import { DataPrivacyCard } from "./DataPrivacyCard";
 import Header from "./Header";
-import PermissionsCard from "./PermissionsCard";
+import { PermissionsCard } from "./PermissionsCard";
 
 export interface AppDetailsPageProps {
   loading: boolean;
   data: AppQuery["app"];
-  navigateToApp: () => void;
   onAppActivateOpen: () => void;
   onAppDeactivateOpen: () => void;
   onAppDeleteOpen: () => void;
@@ -19,27 +21,68 @@ export interface AppDetailsPageProps {
 export const AppDetailsPage: React.FC<AppDetailsPageProps> = ({
   data,
   loading,
-  navigateToApp,
   onAppActivateOpen,
   onAppDeactivateOpen,
   onAppDeleteOpen,
-}) => (
-  <>
-    <Header
-      data={data}
-      navigateToApp={navigateToApp}
-      onAppActivateOpen={onAppActivateOpen}
-      onAppDeactivateOpen={onAppDeactivateOpen}
-      onAppDeleteOpen={onAppDeleteOpen}
-    />
-    <AboutCard aboutApp={data?.aboutApp} loading={loading} />
-    <CardSpacer />
-    <PermissionsCard permissions={data?.permissions} loading={loading} />
-    <CardSpacer />
-    <DataPrivacyCard dataPrivacyUrl={data?.dataPrivacyUrl} loading={loading} />
-    <CardSpacer />
-  </>
-);
+}) => {
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <ErrorBoundary
+      onError={errorTracker.captureException}
+      fallbackRender={() => (
+        <Box padding={4}>
+          <Text>Error, please refresh the page</Text>
+        </Box>
+      )}
+    >
+      <Header
+        data={data}
+        onAppActivateOpen={onAppActivateOpen}
+        onAppDeactivateOpen={onAppDeactivateOpen}
+        onAppDeleteOpen={onAppDeleteOpen}
+      />
+      <Box
+        display="grid"
+        gridTemplateColumns={{ desktop: 2, tablet: 2, mobile: 1 }}
+      >
+        <Box
+          borderColor="default1"
+          borderRightStyle={"solid"}
+          borderRightWidth={1}
+        >
+          <AboutCard
+            padding={6}
+            borderBottomStyle="solid"
+            borderBottomWidth={1}
+            borderColor="default1"
+            aboutApp={data?.aboutApp}
+            loading={loading}
+          />
+          <PermissionsCard
+            appId={data.id}
+            padding={6}
+            borderBottomStyle="solid"
+            borderBottomWidth={1}
+            borderColor="default1"
+            permissions={data?.permissions}
+            loading={loading}
+          />
+          <DataPrivacyCard
+            padding={6}
+            borderBottomStyle="solid"
+            borderBottomWidth={1}
+            borderColor="default1"
+            dataPrivacyUrl={data?.dataPrivacyUrl}
+            loading={loading}
+          />
+        </Box>
+        <AppWebhooksDisplay padding={6} appId={data.id} />
+      </Box>
+    </ErrorBoundary>
+  );
+};
 
 AppDetailsPage.displayName = "AppDetailsPage";
-export default AppDetailsPage;

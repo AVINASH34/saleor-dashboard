@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FormData } from "@dashboard/channels/components/ChannelForm/ChannelForm";
 import { WindowTitle } from "@dashboard/components/WindowTitle";
 import {
@@ -10,9 +11,8 @@ import {
 import { getSearchFetchMoreProps } from "@dashboard/hooks/makeTopLevelSearch/utils";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import useNotifier from "@dashboard/hooks/useNotifier";
-import { getDefaultNotifierSuccessErrorData } from "@dashboard/hooks/useNotifier/utils";
 import useShop from "@dashboard/hooks/useShop";
-import { extractMutationErrors } from "@dashboard/misc";
+import { commonMessages } from "@dashboard/intl";
 import getChannelsErrorMessage from "@dashboard/utils/errors/channels";
 import currencyCodes from "currency-codes";
 import React from "react";
@@ -20,11 +20,11 @@ import { useIntl } from "react-intl";
 
 import ChannelDetailsPage from "../../pages/ChannelDetailsPage";
 import { channelPath } from "../../urls";
-import { calculateItemsOrderMoves } from "../ChannelDetails/handlers";
 import { useShippingZones } from "../ChannelDetails/useShippingZones";
 import { useWarehouses } from "../ChannelDetails/useWarehouses";
+import { useSaveChannel } from "./useSaveChannel";
 
-export const ChannelCreateView = ({}) => {
+export const ChannelCreateView = () => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -39,7 +39,12 @@ export const ChannelCreateView = ({}) => {
 
   const [createChannel, createChannelOpts] = useChannelCreateMutation({
     onCompleted: ({ channelCreate: { errors } }: ChannelCreateMutation) => {
-      notify(getDefaultNotifierSuccessErrorData(errors, intl));
+      if (!errors.length) {
+        notify({
+          status: "success",
+          text: intl.formatMessage(commonMessages.savedChanges),
+        });
+      }
     },
   });
 
@@ -55,6 +60,11 @@ export const ChannelCreateView = ({}) => {
       },
     });
 
+  const saveChannel = useSaveChannel({
+    createChannel,
+    reorderChannelWarehouses,
+  });
+
   const handleSubmit = async ({
     shippingZonesIdsToAdd,
     warehousesIdsToAdd,
@@ -65,6 +75,8 @@ export const ChannelCreateView = ({}) => {
     slug,
     defaultCountry,
     markAsPaidStrategy,
+    deleteExpiredOrdersAfter,
+    allowUnpaidOrders,
   }: FormData) => {
     const input: ChannelCreateInput = {
       defaultCountry,
@@ -78,33 +90,12 @@ export const ChannelCreateView = ({}) => {
       },
       orderSettings: {
         markAsPaidStrategy,
+        deleteExpiredOrdersAfter,
+        allowUnpaidOrders,
       },
     };
 
-    const createChannelMutation = createChannel({
-      variables: {
-        input,
-      },
-    });
-
-    const result = await createChannelMutation;
-    const errors = await extractMutationErrors(createChannelMutation);
-
-    if (!errors?.length) {
-      const moves = calculateItemsOrderMoves(
-        result.data?.channelCreate.channel?.warehouses,
-        warehousesToDisplay,
-      );
-
-      await reorderChannelWarehouses({
-        variables: {
-          channelId: result.data?.channelCreate.channel?.id,
-          moves,
-        },
-      });
-    }
-
-    return errors;
+    return saveChannel(input, warehousesToDisplay);
   };
 
   const {

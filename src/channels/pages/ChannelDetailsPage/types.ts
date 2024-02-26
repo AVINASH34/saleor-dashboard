@@ -8,7 +8,7 @@ export type ChannelShippingZones = RelayToFlat<
   ChannelShippingZonesQuery["shippingZones"]
 >;
 
-export type ChannelShippingZone = ChannelShippingZones[0];
+export type ChannelShippingZone = NonNullable<ChannelShippingZones>[number];
 
 export type ChannelWarehouses = WarehouseFragment[];
 

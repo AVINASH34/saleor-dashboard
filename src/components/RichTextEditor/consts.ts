@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import strikethroughIcon from "@dashboard/icons/StrikethroughIcon";
 import { ToolConstructable, ToolSettings } from "@editorjs/editorjs";
 import Embed from "@editorjs/embed";
@@ -30,7 +31,7 @@ export const tools: Record<string, ToolConstructable | ToolSettings> = {
   paragraph: {
     class: Paragraph,
     inlineToolbar,
-  },
+  } as unknown as ToolConstructable,
   strikethrough: createGenericInlineTool({
     sanitize: {
       s: {},

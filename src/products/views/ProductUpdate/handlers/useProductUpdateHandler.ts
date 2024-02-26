@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   mergeAttributeValueDeleteErrors,
   mergeFileUploadErrors,
@@ -158,7 +159,11 @@ export function useProductUpdateHandler(
         variables: {
           id: product.id,
           inputs: data.variants.added.map(index => ({
-            ...getCreateVariantInput(data.variants, index),
+            ...getCreateVariantInput(
+              data.variants,
+              index,
+              product?.productType?.variantAttributes ?? [],
+            ),
           })),
         },
       });
@@ -175,6 +180,7 @@ export function useProductUpdateHandler(
       const updateInputdData = getBulkVariantUpdateInputs(
         product.variants,
         data.variants,
+        product?.productType?.variantAttributes ?? [],
       );
 
       if (updateInputdData.length) {
@@ -200,7 +206,7 @@ export function useProductUpdateHandler(
       ...errors,
       ...mergeFileUploadErrors(uploadFilesResult),
       ...mergeAttributeValueDeleteErrors(deleteAttributeValuesResult),
-      ...updateProductResult.data.productUpdate.errors,
+      ...(updateProductResult?.data?.productUpdate?.errors ?? []),
     ];
 
     setVariantListErrors(variantErrors);

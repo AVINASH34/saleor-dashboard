@@ -1,40 +1,35 @@
 import { AppLogo } from "@dashboard/apps/types";
-import { Box, GenericAppIcon } from "@saleor/macaw-ui/next";
+import { Box, GenericAppIcon } from "@saleor/macaw-ui-next";
 import React from "react";
-
-const avatarSize = 11;
-
+type Logo = AppLogo | undefined;
+type Size = 8 | 12;
 export const AppAvatar: React.FC<{
-  logo?: AppLogo | undefined;
-}> = ({ logo }) => {
-  if (logo?.source) {
-    return (
-      <Box
-        __backgroundColor={logo?.color}
-        padding={3}
-        width={avatarSize}
-        height={avatarSize}
-        borderRadius={2}
-        display="flex"
-        placeItems="center"
-      >
-        <Box as="img" src={logo.source} />
-      </Box>
-    );
-  } else {
-    return (
-      <Box
-        __backgroundColor={logo?.color}
-        backgroundColor="surfaceNeutralSubdued"
-        padding={3}
-        width={avatarSize}
-        height={avatarSize}
-        display="flex"
-        placeItems="center"
-        borderRadius={2}
-      >
-        <GenericAppIcon size="large" color="iconNeutralSubdued" />
-      </Box>
-    );
-  }
-};
+  logo?: Logo;
+  size?: Size;
+}> = ({ logo, size = 8 }) =>
+  logo ? (
+    <Box
+      width={size}
+      height={size}
+      display="flex"
+      placeItems="center"
+      borderRadius={2}
+    >
+      <Box as="img" src={logo.source} width={"100%"} />
+    </Box>
+  ) : (
+    <Box
+      padding={1}
+      backgroundColor="default2"
+      width={size}
+      height={size}
+      display="flex"
+      placeItems="center"
+      borderRadius={2}
+      borderWidth={1}
+      borderColor="default1"
+      borderStyle={"solid"}
+    >
+      <GenericAppIcon size="large" color="default2" />
+    </Box>
+  );

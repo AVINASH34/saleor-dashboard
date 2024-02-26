@@ -1,20 +1,20 @@
 import { appsMessages } from "@dashboard/apps/messages";
 import { buttonMessages } from "@dashboard/intl";
 import { TextField } from "@material-ui/core";
-import { Box, Button } from "@saleor/macaw-ui/next";
+import { Box, Button } from "@saleor/macaw-ui-next";
 import React, { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { messages } from "./messages";
 import { useStyles } from "./styles";
 
-interface Props {
-  onSubmitted(manifestUrl: string): void;
+interface InstallWithManifestFormButtonProps {
+  onSubmitted: (manifestUrl: string) => void;
 }
 
-export const InstallWithManifestFormButton: React.FC<Props> = ({
-  onSubmitted,
-}) => {
+export const InstallWithManifestFormButton: React.FC<
+  InstallWithManifestFormButtonProps
+> = ({ onSubmitted }) => {
   const styles = useStyles();
   const intl = useIntl();
 
@@ -27,9 +27,8 @@ export const InstallWithManifestFormButton: React.FC<Props> = ({
     const inputValue = form.get("manifest-url") as string;
 
     try {
-      new URL(inputValue);
-
-      onSubmitted(inputValue);
+      const parsedURL = new URL(inputValue);
+      onSubmitted(parsedURL.href);
     } catch (e) {
       console.error("Invalid URL from input. Should be validated by browser");
     }

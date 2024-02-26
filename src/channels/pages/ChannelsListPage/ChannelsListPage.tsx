@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { channelAddUrl, channelUrl } from "@dashboard/channels/urls";
 import { LimitsInfo } from "@dashboard/components/AppLayout/LimitsInfo";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
@@ -107,11 +108,12 @@ export const ChannelsListPage: React.FC<ChannelsListPageProps> = ({
               </TableCell>
             </TableRowLink>
           </TableHead>
-          <TableBody>
+          <TableBody data-test-id="channel-list">
             {renderCollection(
               channelsList,
               channel => (
                 <TableRowLink
+                  data-test-id="channel-row"
                   hover={!!channel}
                   key={channel ? channel.id : "skeleton"}
                   className={classes.tableRow}
@@ -128,6 +130,7 @@ export const ChannelsListPage: React.FC<ChannelsListPageProps> = ({
                         <IconButton
                           variant="secondary"
                           color="primary"
+                          data-test-id="delete-channel"
                           onClick={
                             channel
                               ? stopPropagation(() => onRemove(channel.id))

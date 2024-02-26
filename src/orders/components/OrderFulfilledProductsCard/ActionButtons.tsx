@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import { FulfillmentStatus } from "@dashboard/graphql";
 import { buttonMessages, commonMessages } from "@dashboard/intl";
@@ -16,8 +17,8 @@ interface AcionButtonsProps {
   orderIsPaid?: boolean;
   fulfillmentAllowUnpaid: boolean;
   hasTransactions: boolean;
-  onTrackingCodeAdd();
-  onApprove();
+  onTrackingCodeAdd: () => any;
+  onApprove: () => any;
 }
 
 const statusesToShow = [
@@ -73,13 +74,21 @@ const ActionButtons: React.FC<AcionButtonsProps> = ({
 
   return hasTrackingNumber ? (
     <CardActions className={classes.actions}>
-      <Button variant="primary" onClick={onTrackingCodeAdd}>
+      <Button
+        data-test-id="edit-tracking-button"
+        variant="primary"
+        onClick={onTrackingCodeAdd}
+      >
         <FormattedMessage {...actionButtonsMessages.editTracking} />
       </Button>
     </CardActions>
   ) : (
     <CardActions className={classes.actions}>
-      <Button variant="primary" onClick={onTrackingCodeAdd}>
+      <Button
+        variant="primary"
+        onClick={onTrackingCodeAdd}
+        data-test-id="add-tracking-button"
+      >
         <FormattedMessage {...actionButtonsMessages.addTracking} />
       </Button>
     </CardActions>

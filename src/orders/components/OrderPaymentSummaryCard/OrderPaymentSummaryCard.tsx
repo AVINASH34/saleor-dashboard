@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import { Pill } from "@dashboard/components/Pill";
@@ -9,7 +10,7 @@ import {
   orderSendRefundUrl,
 } from "@dashboard/orders/urls";
 import { Card, CardContent, Typography } from "@material-ui/core";
-import { Divider } from "@saleor/macaw-ui/next";
+import { Divider } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -70,6 +71,7 @@ const OrderPaymentSummaryCard: React.FC<OrderPaymementProps> = ({
             label={payment.localized}
             color={payment.status}
             className={classes.paymentStatus}
+            data-test-id="payment-status"
           />
         }
         title={<FormattedMessage {...orderPaymentMessages.paymentTitle} />}
@@ -78,7 +80,10 @@ const OrderPaymentSummaryCard: React.FC<OrderPaymementProps> = ({
         !shouldDisplay.charged &&
         !shouldDisplay.authorized &&
         !hasGiftCards && (
-          <CardContent className={classes.noPaymentContent}>
+          <CardContent
+            className={classes.noPaymentContent}
+            data-test-id="payment-section"
+          >
             <Typography variant="h5" className={classes.noPaymentTitle}>
               <FormattedMessage {...orderPaymentMessages.noPayments} />
             </Typography>

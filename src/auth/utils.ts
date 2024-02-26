@@ -24,13 +24,17 @@ const getNetworkErrors = (error: ApolloError): string[] => {
     if (Array.isArray(networkErrors.result)) {
       networkErrors.result.forEach(result => {
         if (result.errors) {
-          return result.errors.map(({ message }) => message);
+          return result.errors.map(
+            ({ message }: { message: string }) => message,
+          );
         }
       });
     }
 
     if (networkErrors.result?.errors) {
-      return networkErrors.result.errors.map(({ message }) => message);
+      return networkErrors.result.errors.map(
+        ({ message }: { message: string }) => message,
+      );
     }
 
     return [networkErrors.message];
@@ -80,6 +84,7 @@ export const handleNestedMutationErrors = ({
           intl,
           code: error.code,
           field: error.field,
+          voucherCodes: error.voucherCodes,
         }),
       });
     });

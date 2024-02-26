@@ -1,12 +1,14 @@
-import { ArrowLeftIcon, Button, sprinkles } from "@saleor/macaw-ui/next";
+import { ArrowLeftIcon, Button, sprinkles } from "@saleor/macaw-ui-next";
 import React from "react";
 import { Link } from "react-router-dom";
 
+type Variant = "secondary" | "tertiary";
+
 export const TopNavLink: React.FC<{
   to: string;
-  variant?: "secondary" | "tertiary";
+  variant?: Variant;
 }> = ({ to, variant = "secondary" }) => (
-  <Link to={to} className={sprinkles({ marginRight: 5 })}>
+  <Link to={to} className={sprinkles({ marginRight: 2 })}>
     <Button
       icon={<ArrowLeftIcon />}
       variant={variant}

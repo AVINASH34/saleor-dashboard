@@ -1,9 +1,10 @@
+// @ts-strict-ignore
 import { useUser } from "@dashboard/auth";
 import { Button } from "@dashboard/components/Button";
 import { getUserInitials } from "@dashboard/misc";
 import { CardContent, TextField } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { vars } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -33,7 +34,7 @@ const useStyles = makeStyles(
           opacity: [[1], "!important"] as any,
         },
       },
-      background: vars.colors.background.surfaceNeutralPlain,
+      background: vars.colors.background.default1,
     },
     noteRoot: {
       marginBottom: theme.spacing(3),
@@ -66,8 +67,8 @@ interface TimelineAddNoteProps {
   disabled?: boolean;
   message: string;
   reset: () => void;
-  onChange(event: React.ChangeEvent<any>);
-  onSubmit(event: React.FormEvent<any>);
+  onChange: (event: React.ChangeEvent<any>) => any;
+  onSubmit: (event: React.FormEvent<any>) => any;
 }
 
 export const Timeline: React.FC<TimelineProps> = props => {

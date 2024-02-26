@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 export const extractQueryParams = (queryString: string) => {
   const urlSearchParams = new URLSearchParams(queryString);
   const queryParams = {};
@@ -9,7 +10,7 @@ export const extractQueryParams = (queryString: string) => {
     if (match) {
       const arrayKey = match[1];
 
-      if (!queryParams.hasOwnProperty(arrayKey)) {
+      if (!Object.prototype.hasOwnProperty.call(queryParams, arrayKey)) {
         queryParams[arrayKey] = [];
       }
 

@@ -1,11 +1,11 @@
-import { GetV2SaleorAppsResponse } from "@dashboard/apps/marketplace.types";
-import { Box, Text } from "@saleor/macaw-ui/next";
+import { AppstoreApi } from "@dashboard/apps/appstore.types";
+import { Box, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 
 import { AppLogo } from "./AppLogo";
 
 interface AppListCardDescriptionProps {
-  app: GetV2SaleorAppsResponse.SaleorApp;
+  app: AppstoreApi.SaleorApp;
 }
 
 const AppListCardDescription: React.FC<AppListCardDescriptionProps> = ({
@@ -16,16 +16,16 @@ const AppListCardDescription: React.FC<AppListCardDescriptionProps> = ({
     borderWidth={1}
     borderTopLeftRadius={3}
     borderTopRightRadius={3}
-    borderColor="neutralPlain"
+    borderColor="default1"
     borderBottomStyle="none"
-    padding={8}
+    padding={5}
   >
     <Box
       display="flex"
       flexDirection="row"
       alignItems="center"
-      marginBottom={8}
-      gap={6}
+      marginBottom={5}
+      gap={3}
     >
       <AppLogo backgroundColor={app.logo.color}>
         {app.logo.source ? (
@@ -36,17 +36,17 @@ const AppListCardDescription: React.FC<AppListCardDescriptionProps> = ({
             size="large"
             as="h2"
             data-test-id="app-logo-placeholder"
-            color="textNeutralContrasted"
+            color="default1"
           >
             {app.name.en.charAt(0).toUpperCase() || ""}
           </Text>
         )}
       </AppLogo>
-      <Text variant="bodyStrong" size="medium" color="textNeutralDefault">
+      <Text variant="bodyStrong" size="medium" color="default1">
         <strong>{app.name.en}</strong>
       </Text>
     </Box>
-    <Text size="small" variant="body" color="textNeutralSubdued">
+    <Text size="small" variant="body" color="default2">
       {app.description.en}
     </Text>
   </Box>

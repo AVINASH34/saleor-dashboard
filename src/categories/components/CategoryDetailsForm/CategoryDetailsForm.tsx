@@ -14,7 +14,7 @@ import { useIntl } from "react-intl";
 interface CategoryDetailsFormProps {
   data: {
     name: string;
-    description: OutputData;
+    description: OutputData | null;
   };
   disabled: boolean;
   errors: ProductErrorFragment[];
@@ -28,12 +28,8 @@ export const CategoryDetailsForm: React.FC<CategoryDetailsFormProps> = ({
   errors,
 }) => {
   const intl = useIntl();
-  const {
-    defaultValue,
-    editorRef,
-    isReadyForMount,
-    handleChange,
-  } = useRichTextContext();
+  const { defaultValue, editorRef, isReadyForMount, handleChange } =
+    useRichTextContext();
 
   const formErrors = getFormErrors(["name", "description"], errors);
 
@@ -45,6 +41,7 @@ export const CategoryDetailsForm: React.FC<CategoryDetailsFormProps> = ({
       <CardContent>
         <div>
           <TextField
+            data-test-id="category-name-input"
             label={intl.formatMessage({
               id: "vEYtiq",
               defaultMessage: "Category Name",
@@ -61,6 +58,7 @@ export const CategoryDetailsForm: React.FC<CategoryDetailsFormProps> = ({
         <FormSpacer />
         {isReadyForMount ? (
           <RichTextEditor
+            data-test-id="category-description-editor"
             defaultValue={defaultValue}
             editorRef={editorRef}
             onChange={handleChange}

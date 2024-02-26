@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import useLocalStorage from "@dashboard/hooks/useLocalStorage";
 import useNotifier from "@dashboard/hooks/useNotifier";
 import { Divider, Fade, Modal, Paper } from "@material-ui/core";
@@ -91,10 +92,9 @@ const Navigator: React.FC<NavigatorProps> = ({ visible, setVisibility }) => {
             description: "navigator notification",
           },
           {
-            keyboardShortcut:
-              navigator.platform.toLowerCase().indexOf("mac") >= 0
-                ? "⌘+K"
-                : "Ctrl+K",
+            keyboardShortcut: navigator.platform.toLowerCase().includes("mac")
+              ? "⌘+K"
+              : "Ctrl+K",
           },
         ),
         title: intl.formatMessage({
@@ -129,7 +129,7 @@ const Navigator: React.FC<NavigatorProps> = ({ visible, setVisibility }) => {
                 item ? item.label : ""
               }
               onSelect={(item: QuickSearchAction) => {
-                const shouldRemainVisible = item.onClick();
+                const shouldRemainVisible = item?.onClick();
                 if (!shouldRemainVisible) {
                   setVisibility(false);
                 }

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import Checkbox from "@dashboard/components/Checkbox";
@@ -80,7 +81,11 @@ const ShippingMethodProducts: React.FC<ShippingMethodProductsProps> = props => {
           description: "section header",
         })}
         toolbar={
-          <Button variant="tertiary" onClick={onProductAssign}>
+          <Button
+            data-test-id="assign-product-button"
+            variant="tertiary"
+            onClick={onProductAssign}
+          >
             <FormattedMessage
               id="U8eeLW"
               defaultMessage="Assign products"
@@ -128,7 +133,10 @@ const ShippingMethodProducts: React.FC<ShippingMethodProductsProps> = props => {
             renderCollection(products, product => {
               const isSelected = product ? isChecked(product.id) : false;
               return (
-                <TableRowLink key={product ? product.id : "skeleton"}>
+                <TableRowLink
+                  data-test-id="excluded-products-rows"
+                  key={product ? product.id : "skeleton"}
+                >
                   <TableCell padding="checkbox">
                     <Checkbox
                       checked={isSelected}

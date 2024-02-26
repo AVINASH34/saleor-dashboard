@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FetchResult } from "@apollo/client";
 import { VoucherDetailsPageFormData } from "@dashboard/discounts/components/VoucherDetailsPage";
 import { getChannelsVariables } from "@dashboard/discounts/handlers";
@@ -26,14 +27,20 @@ export function createHandler(
   updateChannels: (options: {
     variables: VoucherChannelListingUpdateMutationVariables;
   }) => Promise<FetchResult<VoucherChannelListingUpdateMutation>>,
+  validateFn: (data: VoucherDetailsPageFormData) => boolean,
 ) {
   return async (formData: VoucherDetailsPageFormData) => {
+    if (!validateFn(formData)) {
+      return { errors: ["Invalid data"] };
+    }
+
     const response = await voucherCreate({
       input: {
+        name: formData.name,
         applyOncePerCustomer: formData.applyOncePerCustomer,
         applyOncePerOrder: formData.applyOncePerOrder,
         onlyForStaff: formData.onlyForStaff,
-        code: formData.code,
+        addCodes: formData.codes.map(({ code }) => code).reverse(),
         discountValueType:
           formData.discountType === DiscountTypeEnum.VALUE_PERCENTAGE
             ? DiscountValueTypeEnum.PERCENTAGE
@@ -53,6 +60,7 @@ export function createHandler(
             ? VoucherTypeEnum.SHIPPING
             : formData.type,
         usageLimit: formData.hasUsageLimit ? formData.usageLimit : null,
+        singleUse: formData.singleUse,
       },
     });
 

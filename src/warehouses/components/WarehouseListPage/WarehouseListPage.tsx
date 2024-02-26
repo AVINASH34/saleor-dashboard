@@ -35,7 +35,7 @@ export interface WarehouseListPageProps
     TabPageProps {
   limits: RefreshLimitsQuery["shop"]["limits"] | undefined;
   warehouses: WarehouseWithShippingFragment[] | undefined;
-  onRemove: (id: string) => void;
+  onRemove: (id: string | undefined) => void;
 }
 
 export const WarehouseListPage: React.FC<WarehouseListPageProps> = ({

@@ -84,6 +84,7 @@ export const fragmentOrderLine = gql`
     }
     variant {
       id
+      name
       quantityAvailable
       preorder {
         endDate
@@ -98,6 +99,7 @@ export const fragmentOrderLine = gql`
     }
     productName
     productSku
+    isGift
     quantity
     quantityFulfilled
     quantityToFulfill
@@ -138,6 +140,20 @@ export const fragmentOrderLine = gql`
   }
 `;
 
+export const fragmentOrderLineWithMetadata = gql`
+  fragment OrderLineWithMetadata on OrderLine {
+    ...OrderLine
+    variant {
+      metadata {
+        ...MetadataItem
+      }
+      privateMetadata @include(if: $isStaffUser) {
+        ...MetadataItem
+      }
+    }
+  }
+`;
+
 export const fragmentRefundOrderLine = gql`
   fragment RefundOrderLine on OrderLine {
     id
@@ -156,6 +172,7 @@ export const fragmentRefundOrderLine = gql`
 
 export const fulfillmentFragment = gql`
   fragment Fulfillment on Fulfillment {
+    ...Metadata
     id
     lines {
       id
@@ -170,6 +187,17 @@ export const fulfillmentFragment = gql`
     warehouse {
       id
       name
+    }
+  }
+`;
+
+export const fulfillmentFragmentWithMetadata = gql`
+  fragment FulfillmentWithMetadata on Fulfillment {
+    ...Fulfillment
+    lines {
+      orderLine {
+        ...OrderLineWithMetadata
+      }
     }
   }
 `;
@@ -356,6 +384,18 @@ export const fragmentOrderDetails = gql`
   }
 `;
 
+export const fragmentOrderDetailsWithMetadata = gql`
+  fragment OrderDetailsWithMetadata on Order {
+    ...OrderDetails
+    fulfillments {
+      ...FulfillmentWithMetadata
+    }
+    lines {
+      ...OrderLineWithMetadata
+    }
+  }
+`;
+
 export const fragmentOrderSettings = gql`
   fragment OrderSettings on OrderSettings {
     automaticallyConfirmAllNewOrders
@@ -454,12 +494,9 @@ export const transactionEvent = gql`
 export const transactionItemFragment = gql`
   fragment TransactionItem on TransactionItem {
     id
-    # TODO: remove me
-    type
     pspReference
     actions
-    type
-    status
+    name
     externalUrl
     events {
       ...TransactionEvent
@@ -552,6 +589,7 @@ export const fragmentOrderGrantedRefunds = gql`
   fragment OrderGrantedRefund on OrderGrantedRefund {
     id
     createdAt
+    shippingCostsIncluded
     amount {
       currency
       amount
@@ -581,6 +619,24 @@ export const orderLineGrantRefund = gql`
     unitPrice {
       gross {
         ...Money
+      }
+    }
+  }
+`;
+
+export const orderDetailsGrantedRefund = gql`
+  fragment OrderDetailsGrantedRefund on OrderGrantedRefund {
+    id
+    reason
+    amount {
+      ...Money
+    }
+    shippingCostsIncluded
+    lines {
+      id
+      quantity
+      orderLine {
+        ...OrderLine
       }
     }
   }
@@ -620,6 +676,9 @@ export const fragmentOrderDetailsGrantRefund = gql`
       gross {
         ...Money
       }
+    }
+    grantedRefunds {
+      ...OrderDetailsGrantedRefund
     }
   }
 `;

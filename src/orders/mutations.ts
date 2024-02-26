@@ -146,7 +146,7 @@ export const orderReturnCreateMutation = gql`
         ...OrderError
       }
       order {
-        id
+        ...OrderDetails
       }
       replaceOrder {
         id
@@ -510,15 +510,55 @@ export const orderTransactionRequestActionMutation = gql`
 export const orderGrantRefundAddMutation = gql`
   mutation OrderGrantRefundAdd(
     $orderId: ID!
-    $amount: Decimal!
+    $amount: Decimal
     $reason: String
+    $lines: [OrderGrantRefundCreateLineInput!]
+    $grantRefundForShipping: Boolean
   ) {
     orderGrantRefundCreate(
       id: $orderId
-      input: { amount: $amount, reason: $reason }
+      input: {
+        amount: $amount
+        reason: $reason
+        lines: $lines
+        grantRefundForShipping: $grantRefundForShipping
+      }
     ) {
       errors {
         ...OrderGrantRefundCreateError
+      }
+      grantedRefund {
+        id
+      }
+    }
+  }
+`;
+
+export const orderGrantRefundAddWithOrderMutation = gql`
+  mutation OrderGrantRefundAddWithOrder(
+    $orderId: ID!
+    $amount: Decimal
+    $reason: String
+    $lines: [OrderGrantRefundCreateLineInput!]
+    $grantRefundForShipping: Boolean
+  ) {
+    orderGrantRefundCreate(
+      id: $orderId
+      input: {
+        amount: $amount
+        reason: $reason
+        lines: $lines
+        grantRefundForShipping: $grantRefundForShipping
+      }
+    ) {
+      errors {
+        ...OrderGrantRefundCreateError
+      }
+      grantedRefund {
+        id
+      }
+      order {
+        ...OrderDetails
       }
     }
   }
@@ -527,12 +567,21 @@ export const orderGrantRefundAddMutation = gql`
 export const orderGrantRefundEditMutation = gql`
   mutation OrderGrantRefundEdit(
     $refundId: ID!
-    $amount: Decimal!
+    $amount: Decimal
     $reason: String
+    $addLines: [OrderGrantRefundUpdateLineAddInput!]
+    $removeLines: [ID!]
+    $grantRefundForShipping: Boolean
   ) {
     orderGrantRefundUpdate(
       id: $refundId
-      input: { amount: $amount, reason: $reason }
+      input: {
+        amount: $amount
+        reason: $reason
+        addLines: $addLines
+        removeLines: $removeLines
+        grantRefundForShipping: $grantRefundForShipping
+      }
     ) {
       errors {
         ...OrderGrantRefundUpdateError
@@ -558,6 +607,25 @@ export const orderSendRefundMutation = gql`
   }
 `;
 
+export const orderSendRefundForGrantedRefund = gql`
+  mutation OrderSendRefundForGrantedRefund(
+    $grantedRefundId: ID!
+    $transactionId: ID!
+  ) {
+    transactionRequestRefundForGrantedRefund(
+      grantedRefundId: $grantedRefundId
+      id: $transactionId
+    ) {
+      transaction {
+        ...TransactionItem
+      }
+      errors {
+        ...TransactionRequestRefundForGrantedRefundError
+      }
+    }
+  }
+`;
+
 export const createManualTransactionCapture = gql`
   mutation CreateManualTransactionCapture(
     $orderId: ID!
@@ -569,16 +637,11 @@ export const createManualTransactionCapture = gql`
     transactionCreate(
       id: $orderId
       transaction: {
-        type: "Manual capture"
-        status: "Success"
+        name: "Manual capture"
         pspReference: $pspReference
         amountCharged: { amount: $amount, currency: $currency }
       }
-      transactionEvent: {
-        status: SUCCESS
-        pspReference: $pspReference
-        name: $description
-      }
+      transactionEvent: { pspReference: $pspReference, message: $description }
     ) {
       transaction {
         ...TransactionItem
@@ -601,16 +664,11 @@ export const createManualTransactionRefund = gql`
     transactionCreate(
       id: $orderId
       transaction: {
-        type: "Manual refund"
-        status: "Success"
+        name: "Manual refund"
         pspReference: $pspReference
         amountRefunded: { amount: $amount, currency: $currency }
       }
-      transactionEvent: {
-        status: SUCCESS
-        pspReference: $pspReference
-        name: $description
-      }
+      transactionEvent: { pspReference: $pspReference, message: $description }
     ) {
       transaction {
         ...TransactionItem

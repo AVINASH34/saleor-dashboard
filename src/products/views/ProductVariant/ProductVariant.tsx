@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import placeholderImg from "@assets/images/placeholder255x255.png";
 import {
   getAttributesAfterFileAttributesUpdate,
@@ -27,8 +28,8 @@ import {
   useVariantMediaAssignMutation,
   useVariantMediaUnassignMutation,
   useVariantUpdateMutation,
-  useWarehouseListQuery,
 } from "@dashboard/graphql";
+import { useFetchAllWarehouses } from "@dashboard/hooks/useFetchAllWarehouse";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import useNotifier from "@dashboard/hooks/useNotifier";
 import useOnSetDefaultVariant from "@dashboard/hooks/useOnSetDefaultVariant";
@@ -132,37 +133,31 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({
     },
   });
 
-  const [
-    deleteAttributeValue,
-    deleteAttributeValueOpts,
-  ] = useAttributeValueDeleteMutation({});
+  const [deleteAttributeValue, deleteAttributeValueOpts] =
+    useAttributeValueDeleteMutation({});
 
   const { handleSubmitChannels, updateChannelsOpts } = useSubmitChannels();
 
   const variant = data?.productVariant;
   const channels = createVariantChannels(variant);
 
-  const warehouses = useWarehouseListQuery({
+  const warehouses = useFetchAllWarehouses({
     displayLoader: true,
     variables: {
-      first: 50,
+      first: 100,
       filter: {
         channels: channels.map(channel => channel.id),
       },
     },
   });
 
-  const [
-    deactivatePreorder,
-    deactivatePreoderOpts,
-  ] = useProductVariantPreorderDeactivateMutation({});
+  const [deactivatePreorder, deactivatePreoderOpts] =
+    useProductVariantPreorderDeactivateMutation({});
   const handleDeactivateVariantPreorder = (id: string) =>
     deactivatePreorder({ variables: { id } });
 
-  const [
-    reorderProductVariants,
-    reorderProductVariantsOpts,
-  ] = useProductVariantReorderMutation({});
+  const [reorderProductVariants, reorderProductVariantsOpts] =
+    useProductVariantReorderMutation({});
 
   const onSetDefaultVariant = useOnSetDefaultVariant(productId, variant);
 
@@ -188,11 +183,12 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({
       variables => uploadFile({ variables }),
     );
 
-    const deleteAttributeValuesResult = await handleDeleteMultipleAttributeValues(
-      data.attributesWithNewFileValue,
-      variant?.nonSelectionAttributes,
-      variables => deleteAttributeValue({ variables }),
-    );
+    const deleteAttributeValuesResult =
+      await handleDeleteMultipleAttributeValues(
+        data.attributesWithNewFileValue,
+        variant?.nonSelectionAttributes,
+        variables => deleteAttributeValue({ variables }),
+      );
 
     const updatedFileAttributes = getAttributesAfterFileAttributesUpdate(
       data.attributesWithNewFileValue,
@@ -257,6 +253,7 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({
   const handleAssignAttributeReferenceClick = (attribute: AttributeInput) =>
     navigate(
       productVariantEditUrl(productId, variantId, {
+        ...params,
         action: "assign-attribute-value",
         id: attribute.id,
       }),
@@ -294,8 +291,9 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({
     onFetchMore: loadMoreProducts,
   };
   const fetchMoreAttributeValues = {
-    hasMore: !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
-      ?.hasNextPage,
+    hasMore:
+      !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
+        ?.hasNextPage,
     loading: !!searchAttributeValuesOpts.loading,
     onFetchMore: loadMoreAttributeValues,
   };

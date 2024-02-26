@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   AppAvatarFragment,
   ChannelUsabilityDataQuery,
@@ -9,6 +10,7 @@ import {
   OrderAction,
   OrderDetailsFragment,
   OrderDetailsQuery,
+  OrderDetailsWithMetadataFragment,
   OrderEventsEmailsEnum,
   OrderEventsEnum,
   OrderFulfillLineFragment,
@@ -110,10 +112,9 @@ export const clients: RelayToFlat<SearchCustomersQuery["search"]> = [
 export const orderTransactions: TransactionItemFragment[] = [
   {
     id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-    type: "mollie-creditcard",
+    name: "mollie-creditcard",
     pspReference: "ord_3d41ih",
     actions: [],
-    status: "Paid",
     externalUrl: null,
     events: [
       {
@@ -144,10 +145,9 @@ export const orderTransactions: TransactionItemFragment[] = [
   },
   {
     id: "VHJhbnNhY3Rpb25JdGVtOjI=",
-    type: "test",
+    name: "test",
     pspReference: "123",
     externalUrl: null,
-    status: "Partially refunded",
     actions: [],
     events: [
       {
@@ -915,7 +915,9 @@ export const orders: RelayToFlat<OrderListQuery["orders"]> = [
 
 export const ORDER_AMOUNT = 234.93;
 
-export const order = (placeholder: string): OrderDetailsFragment => ({
+export const order = (
+  placeholder: string,
+): OrderDetailsWithMetadataFragment => ({
   __typename: "Order",
   giftCards: [],
   actions: [
@@ -1207,6 +1209,8 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       __typename: "Fulfillment",
       fulfillmentOrder: 2,
       id: "RnVsZmlsbG1lbnQ6MjQ=",
+      metadata: [],
+      privateMetadata: [],
       lines: [
         {
           __typename: "FulfillmentLine",
@@ -1220,6 +1224,7 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
             quantity: 2,
             quantityFulfilled: 2,
             quantityToFulfill: 0,
+            isGift: false,
             allocations: [
               {
                 id: "allocation_test_id",
@@ -1287,8 +1292,11 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
             variant: {
               __typename: "ProductVariant",
               id: "dsfsfuhb",
+              name: "XS",
               quantityAvailable: 10,
               preorder: null,
+              metadata: [],
+              privateMetadata: [],
               product: {
                 __typename: "Product",
                 id: "UHJvZHVjdDo1",
@@ -1331,6 +1339,8 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       __typename: "Fulfillment",
       fulfillmentOrder: 1,
       id: "RnVsZmlsbG1lbnQ6OQ==",
+      metadata: [],
+      privateMetadata: [],
       lines: [
         {
           __typename: "FulfillmentLine",
@@ -1344,6 +1354,7 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
             quantity: 2,
             quantityFulfilled: 2,
             quantityToFulfill: 0,
+            isGift: false,
             allocations: [
               {
                 id: "allocation_test_id",
@@ -1411,8 +1422,11 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
             variant: {
               __typename: "ProductVariant",
               id: "dsfsfuhb",
+              name: "XS",
               quantityAvailable: 10,
               preorder: null,
+              metadata: [],
+              privateMetadata: [],
               product: {
                 __typename: "Product",
                 id: "UHJvZHVjdDo1",
@@ -1476,6 +1490,7 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       quantity: 3,
       quantityFulfilled: 0,
       quantityToFulfill: 3,
+      isGift: false,
       allocations: [
         {
           id: "allocation_test_id",
@@ -1543,8 +1558,11 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       variant: {
         __typename: "ProductVariant",
         id: "dsfsfuhb",
+        name: "Soft",
         quantityAvailable: 10,
         preorder: null,
+        metadata: [],
+        privateMetadata: [],
         product: {
           __typename: "Product",
           id: "UHJvZHVjdDo1",
@@ -1585,6 +1603,7 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       quantity: 2,
       quantityFulfilled: 2,
       quantityToFulfill: 0,
+      isGift: false,
       allocations: [
         {
           id: "allocation_test_id",
@@ -1652,8 +1671,11 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
       variant: {
         __typename: "ProductVariant",
         id: "dsfsfuhb",
+        name: "XXL",
         quantityAvailable: 10,
         preorder: null,
+        metadata: [],
+        privateMetadata: [],
         product: {
           __typename: "Product",
           id: "UHJvZHVjdDo1",
@@ -1795,7 +1817,9 @@ export const order = (placeholder: string): OrderDetailsFragment => ({
   transactions: orderTransactions,
 });
 
-export const draftOrder = (placeholder: string): OrderDetailsFragment => ({
+export const draftOrder = (
+  placeholder: string,
+): OrderDetailsWithMetadataFragment => ({
   __typename: "Order" as "Order",
   giftCards: [],
   actions: [OrderAction.CAPTURE],
@@ -1859,6 +1883,7 @@ export const draftOrder = (placeholder: string): OrderDetailsFragment => ({
       quantity: 2,
       quantityFulfilled: 0,
       quantityToFulfill: 2,
+      isGift: false,
       allocations: [
         {
           id: "allocation_test_id",
@@ -1926,8 +1951,11 @@ export const draftOrder = (placeholder: string): OrderDetailsFragment => ({
       variant: {
         __typename: "ProductVariant",
         id: "dsfsfuhb",
+        name: "Hard",
         quantityAvailable: 10,
         preorder: null,
+        metadata: [],
+        privateMetadata: [],
         product: {
           __typename: "Product",
           id: "UHJvZHVjdDo1",
@@ -1968,6 +1996,7 @@ export const draftOrder = (placeholder: string): OrderDetailsFragment => ({
       quantity: 2,
       quantityFulfilled: 0,
       quantityToFulfill: 2,
+      isGift: false,
       allocations: [
         {
           id: "allocation_test_id",
@@ -2035,8 +2064,11 @@ export const draftOrder = (placeholder: string): OrderDetailsFragment => ({
       variant: {
         __typename: "ProductVariant",
         id: "dsfsfuhb",
+        name: "15-1337",
         quantityAvailable: 10,
         preorder: null,
+        metadata: [],
+        privateMetadata: [],
         product: {
           __typename: "Product",
           id: "UHJvZHVjdDo1",
@@ -2240,8 +2272,8 @@ export const variants = [
 ];
 export const prefixes = ["01", "02", "41", "49"];
 export const shippingMethods = [
-  { country: "whole world", id: "s1", name: "DHL", price: {} },
-  { country: "Afghanistan", id: "s2", name: "UPS" },
+  { country: "whole world", id: 1, name: "DHL", price: {} },
+  { country: "Afghanistan", id: 2, name: "UPS" },
 ];
 export const orderLineSearch = (
   placeholderImage: string,
@@ -2622,10 +2654,9 @@ export const transactions: Record<
   preauthorized: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
-      actions: [TransactionActionEnum.VOID, TransactionActionEnum.CHARGE],
-      status: "Authorized",
+      actions: [TransactionActionEnum.CANCEL, TransactionActionEnum.CHARGE],
       externalUrl: null,
       events: [
         {
@@ -2658,9 +2689,8 @@ export const transactions: Record<
   pendingCharge: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
-      status: "Pending charge",
       externalUrl: null,
       actions: [],
       events: [
@@ -2709,10 +2739,9 @@ export const transactions: Record<
   chargeSuccess: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [TransactionActionEnum.REFUND],
-      status: "Fully paid",
       externalUrl: null,
       events: [
         {
@@ -2775,10 +2804,9 @@ export const transactions: Record<
   chargePartial: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [TransactionActionEnum.REFUND],
-      status: "Partially charged",
       externalUrl: null,
       events: [
         {
@@ -2841,10 +2869,9 @@ export const transactions: Record<
   chargeFail: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [TransactionActionEnum.CHARGE],
-      status: "Failed",
       externalUrl: null,
       events: [
         {
@@ -2907,10 +2934,9 @@ export const transactions: Record<
   refundRequested: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [],
-      status: "Pending refund",
       externalUrl: null,
       events: [
         {
@@ -2988,10 +3014,9 @@ export const transactions: Record<
   refundCompleted: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [],
-      status: "Refund completed",
       externalUrl: null,
       events: [
         {
@@ -3084,10 +3109,9 @@ export const transactions: Record<
   refundPartial: [
     {
       id: "VHJhbnNhY3Rpb25JdGVtOjE=",
-      type: "Mollie",
+      name: "Mollie",
       pspReference: "ord_3d41ih",
       actions: [],
-      status: "Partially charged",
       externalUrl: null,
       events: [
         {
@@ -3323,6 +3347,7 @@ export const payments: Record<string, OrderPaymentFragment> = {
 export const grantedRefunds: OrderGrantedRefundFragment[] = [
   {
     id: "1234",
+    shippingCostsIncluded: true,
     amount: prepareMoney(),
     reason: "Products returned",
     app: { id: "123", name: "Saleor Checkout", __typename: "App" },
@@ -3332,6 +3357,7 @@ export const grantedRefunds: OrderGrantedRefundFragment[] = [
   },
   {
     id: "12344",
+    shippingCostsIncluded: false,
     amount: prepareMoney(),
     reason: "Products arrived damaged",
     app: null,

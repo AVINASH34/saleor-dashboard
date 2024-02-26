@@ -1,5 +1,9 @@
+// @ts-strict-ignore
 import Checkbox from "@dashboard/components/Checkbox";
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import VerticalSpacer from "@dashboard/components/VerticalSpacer";
 import { AddressTypeInput } from "@dashboard/customers/types";
@@ -25,7 +29,7 @@ import {
   FormControlLabel,
   Typography,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState, DialogHeader } from "@saleor/macaw-ui";
+import { DialogHeader } from "@saleor/macaw-ui";
 import React from "react";
 import { FormattedMessage, MessageDescriptor, useIntl } from "react-intl";
 
@@ -60,10 +64,10 @@ export interface OrderCustomerAddressesEditDialogProps {
   customerAddresses?: AddressFragment[];
   defaultShippingAddress?: Node;
   defaultBillingAddress?: Node;
-  onClose();
-  onConfirm(
+  onClose: () => any;
+  onConfirm: (
     data: Partial<OrderCustomerAddressesEditDialogOutput>,
-  ): SubmitPromise<any[]>;
+  ) => SubmitPromise<any[]>;
 }
 
 const defaultSearchState: OrderCustomerSearchAddressState = {
@@ -75,7 +79,7 @@ const OrderCustomerAddressesEditDialog: React.FC<
   OrderCustomerAddressesEditDialogProps
 > = props => {
   const {
-    open,
+    open: defaultOpen,
     variant,
     loading,
     confirmButtonState,
@@ -89,6 +93,8 @@ const OrderCustomerAddressesEditDialog: React.FC<
     orderShippingAddress,
     orderBillingAddress,
   } = props;
+
+  const open = !loading && defaultOpen;
 
   const classes = useStyles(props);
   const intl = useIntl();

@@ -1,3 +1,5 @@
+// @ts-strict-ignore
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import {
   MoneyFragment,
   OrderDetailsFragment,
@@ -8,7 +10,6 @@ import {
 import useNotifier from "@dashboard/hooks/useNotifier";
 import { getDefaultNotifierSuccessErrorData } from "@dashboard/hooks/useNotifier/utils";
 import { OrderDiscountCommonInput } from "@dashboard/orders/components/OrderDiscountCommonModal/types";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React, { createContext } from "react";
 import { useIntl } from "react-intl";
 
@@ -89,7 +90,9 @@ export const OrderDiscountProvider: React.FC<OrderDiscountProviderProps> = ({
 
   const removeOrderDiscount = () =>
     orderDiscount &&
-    orderDiscountRemove({ variables: { discountId: orderDiscount.id } });
+    orderDiscountRemove({
+      variables: { discountId: orderDiscount.id },
+    });
 
   const orderDiscountAction = orderDiscount
     ? updateOrderDiscount

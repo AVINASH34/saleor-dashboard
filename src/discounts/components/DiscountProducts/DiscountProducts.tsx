@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import { ChannelsAvailabilityDropdown } from "@dashboard/components/ChannelsAvailabilityDropdown";
@@ -51,7 +52,7 @@ const DiscountProducts: React.FC<SaleProductsProps> = props => {
   const intl = useIntl();
 
   return (
-    <Card>
+    <Card data-test-id="assign-product-section">
       <CardTitle
         title={intl.formatMessage(messages.discountProductsHeader)}
         toolbar={
@@ -98,7 +99,7 @@ const DiscountProducts: React.FC<SaleProductsProps> = props => {
             <TablePaginationWithContext colSpan={numberOfColumns} />
           </TableRowLink>
         </TableFooter>
-        <TableBody>
+        <TableBody data-test-id="assigned-specific-products-table">
           {renderCollection(
             products,
             product => {
@@ -111,6 +112,7 @@ const DiscountProducts: React.FC<SaleProductsProps> = props => {
                   href={product && productUrl(product.id)}
                   className={classes.tableRow}
                   selected={isSelected}
+                  data-test-id="assigned-specific-product"
                 >
                   <TableCell padding="checkbox">
                     <Checkbox

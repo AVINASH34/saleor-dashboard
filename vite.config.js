@@ -7,7 +7,6 @@ import nodePolyfills from "rollup-plugin-polyfill-node";
 import { defineConfig, loadEnv, searchForWorkspaceRoot } from "vite";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
-import viteSentry from "vite-plugin-sentry";
 
 const copyOgImage = () => ({
   name: "copy-og-image",
@@ -33,10 +32,8 @@ export default defineConfig(({ command, mode }) => {
     SW_INTERVAL,
     IS_CLOUD_INSTANCE,
     APP_MOUNT_URI,
-    SENTRY_ORG,
-    SENTRY_PROJECT,
-    SENTRY_AUTH_TOKEN,
     SENTRY_DSN,
+    SENTRY_RELEASE,
     ENVIRONMENT,
     STATIC_URL,
     APPS_MARKETPLACE_API_URI,
@@ -45,7 +42,9 @@ export default defineConfig(({ command, mode }) => {
     DEMO_MODE,
     CUSTOM_VERSION,
     FLAGS_SERVICE_ENABLED,
-    FLAGSMITH_ID,
+    LOCALE_CODE,
+    POSTHOG_KEY,
+    POSTHOG_HOST
   } = env;
 
   const base = STATIC_URL ?? "/";
@@ -54,9 +53,6 @@ export default defineConfig(({ command, mode }) => {
   );
 
   const sourcemap = SKIP_SOURCEMAPS ? false : true;
-
-  const enableSentry =
-    SENTRY_ORG && SENTRY_PROJECT && SENTRY_DSN && SENTRY_AUTH_TOKEN;
 
   const plugins = [
     react(),
@@ -70,6 +66,9 @@ export default defineConfig(({ command, mode }) => {
           APPS_MARKETPLACE_API_URI,
           APPS_TUNNEL_URL_KEYWORDS,
           IS_CLOUD_INSTANCE,
+          LOCALE_CODE,
+          POSTHOG_KEY,
+          POSTHOG_HOST,
           injectOgTags:
             DEMO_MODE &&
             `
@@ -91,18 +90,6 @@ export default defineConfig(({ command, mode }) => {
     copyOgImage(),
   ];
 
-  if (enableSentry) {
-    console.log("Enabling sentry...");
-
-    plugins.push(
-      viteSentry({
-        sourceMaps: {
-          include: ["./build/dashboard"],
-          urlPrefix: process.env.SENTRY_URL_PREFIX,
-        },
-      }),
-    );
-  }
 
   if (!isDev) {
     console.log("Enabling service worker...");
@@ -132,7 +119,6 @@ export default defineConfig(({ command, mode }) => {
     */
     ...(isDev ? { global: {} } : {}),
     FLAGS_SERVICE_ENABLED: FLAGS_SERVICE_ENABLED === "true",
-    FLAGSMITH_ID: JSON.stringify(FLAGSMITH_ID),
     // Keep all feature flags from env in global variable
     FLAGS: JSON.stringify(featureFlagsEnvs),
   };
@@ -163,6 +149,11 @@ export default defineConfig(({ command, mode }) => {
         ENVIRONMENT,
         DEMO_MODE,
         CUSTOM_VERSION,
+        LOCALE_CODE,
+        SENTRY_RELEASE,
+        STATIC_URL,
+        POSTHOG_KEY,
+        POSTHOG_HOST
       },
     },
     build: {

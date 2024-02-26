@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import SingleAutocompleteSelectField from "@dashboard/components/SingleAutocompleteSelectField";
 import { DEFAULT_INITIAL_SEARCH_DATA } from "@dashboard/config";
 import { commonMessages } from "@dashboard/intl";
@@ -16,11 +17,9 @@ export interface GiftCardCustomerSelectFieldProps {
   disabled?: boolean;
 }
 
-const GiftCardCustomerSelectField: React.FC<GiftCardCustomerSelectFieldProps> = ({
-  selectedCustomer,
-  setSelectedCustomer,
-  disabled = false,
-}) => {
+const GiftCardCustomerSelectField: React.FC<
+  GiftCardCustomerSelectFieldProps
+> = ({ selectedCustomer, setSelectedCustomer, disabled = false }) => {
   const intl = useIntl();
 
   const { loadMore, search, result } = useCustomerSearch({
@@ -34,7 +33,7 @@ const GiftCardCustomerSelectField: React.FC<GiftCardCustomerSelectFieldProps> = 
     label: getFullName({ firstName, lastName }),
   }));
 
-  const handleSelect = (event: React.ChangeEvent<any>) => {
+  const handleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     const label = choices?.find(category => category.value === value)?.label;
 

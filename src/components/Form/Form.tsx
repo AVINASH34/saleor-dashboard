@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import useForm, {
   SubmitPromise,
   UseFormResult,
@@ -40,7 +41,10 @@ function Form<TData, Terrors>({
     mergeData,
   });
 
-  function handleSubmit(event?: React.FormEvent<any>, cb?: () => void) {
+  function handleSubmit(
+    event?: React.FormEvent<HTMLFormElement>,
+    cb?: () => void,
+  ) {
     const { reset, submit } = renderProps;
 
     if (event) {

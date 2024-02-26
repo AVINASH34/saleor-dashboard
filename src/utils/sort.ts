@@ -68,7 +68,7 @@ interface SortingInput<T extends string> {
 }
 type GetSortQueryField<TUrlField extends string, TSortField extends string> = (
   sort: TUrlField,
-) => TSortField;
+) => TSortField | undefined;
 type GetSortQueryVariables<
   TSortField extends string,
   TParams extends Record<any, any>,
@@ -93,3 +93,18 @@ export function createGetSortQueryVariables<
     return undefined;
   };
 }
+
+export const sortAlphabetically =
+  <T>(field: keyof T) =>
+  (a: T, b: T) => {
+    const aField = a[field];
+    const bField = b[field];
+
+    if (aField < bField) {
+      return -1;
+    }
+    if (aField > bField) {
+      return 1;
+    }
+    return 0;
+  };

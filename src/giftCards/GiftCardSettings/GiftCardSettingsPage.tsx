@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import Form from "@dashboard/components/Form";
 import { Grid } from "@dashboard/components/Grid";
@@ -12,7 +13,7 @@ import {
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { getFormErrors } from "@dashboard/utils/errors";
 import { Typography } from "@material-ui/core";
-import { Box } from "@saleor/macaw-ui/next";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -68,7 +69,7 @@ const GiftCardSettingsPage: React.FC = () => {
         <Form initial={initialData} onSubmit={handleSubmit}>
           {({ data: formData, submit, change }) => (
             <>
-              <Box padding={9} margin="auto" height="100vh">
+              <Box padding={6} margin="auto" height="100vh">
                 <Grid variant="inverted">
                   <div>
                     <Typography>

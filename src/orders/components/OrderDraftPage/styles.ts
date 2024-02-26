@@ -1,5 +1,5 @@
 import { makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { vars } from "@saleor/macaw-ui-next";
 
 export const useAlertStyles = makeStyles(
   theme => ({
@@ -7,7 +7,7 @@ export const useAlertStyles = makeStyles(
       marginBottom: theme.spacing(3),
       "& .MuiCardContent-root": {
         backgroundColor: "unset",
-        paddingRight: vars.space[11],
+        paddingRight: vars.spacing[8],
       },
     },
   }),

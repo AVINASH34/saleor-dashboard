@@ -26,8 +26,22 @@ window.__SALEOR_CONFIG__ = {
   APPS_MARKETPLACE_API_URI: "http://localhost:3000",
   APPS_TUNNEL_URL_KEYWORDS: ".ngrok.io;.saleor.live",
   IS_CLOUD_INSTANCE: "true",
+  LOCALE_CODE: "EN",
 };
 
 process.env.TZ = "UTC";
 
 configure({ testIdAttribute: "data-test-id" });
+
+/**
+ * https://github.com/inrupt/solid-client-authn-js/issues/1676
+ *
+ * Fixes (hacks) "TextEncoder is not defined" error which is likely bug in jsdom
+ */
+import { TextDecoder, TextEncoder } from "util";
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+
+global.CSS = {
+  supports: () => false,
+} as any;

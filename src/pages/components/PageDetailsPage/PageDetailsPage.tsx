@@ -1,11 +1,14 @@
+// @ts-strict-ignore
 import {
   getReferenceAttributeEntityTypeFromAttribute,
   mergeAttributeValues,
 } from "@dashboard/attributes/utils/data";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import AssignAttributeValueDialog from "@dashboard/components/AssignAttributeValueDialog";
+import { Container } from "@dashboard/components/AssignContainerDialog";
 import { AttributeInput, Attributes } from "@dashboard/components/Attributes";
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Metadata } from "@dashboard/components/Metadata";
 import Savebar from "@dashboard/components/Savebar";
@@ -25,7 +28,6 @@ import useNavigator from "@dashboard/hooks/useNavigator";
 import { pageListUrl } from "@dashboard/pages/urls";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
 import { mapNodeToChoice } from "@dashboard/utils/maps";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -103,7 +105,7 @@ const PageDetailsPage: React.FC<PageDetailsPageProps> = ({
     : [];
 
   const handleAssignReferenceAttribute = (
-    attributeValues: string[],
+    attributeValues: Container[],
     data: PageData,
     handlers: PageUpdateHandlers,
   ) => {
@@ -111,9 +113,13 @@ const PageDetailsPage: React.FC<PageDetailsPageProps> = ({
       assignReferencesAttributeId,
       mergeAttributeValues(
         assignReferencesAttributeId,
-        attributeValues,
+        attributeValues.map(({ id }) => id),
         data.attributes,
       ),
+    );
+    handlers.selectAttributeReferenceMetadata(
+      assignReferencesAttributeId,
+      attributeValues.map(({ id, name }) => ({ value: id, label: name })),
     );
     onCloseDialog();
   };
@@ -242,6 +248,9 @@ const PageDetailsPage: React.FC<PageDetailsPageProps> = ({
                 entityType={getReferenceAttributeEntityTypeFromAttribute(
                   assignReferencesAttributeId,
                   data.attributes,
+                )}
+                attribute={data.attributes.find(
+                  ({ id }) => id === assignReferencesAttributeId,
                 )}
                 confirmButtonState={"default"}
                 products={referenceProducts}

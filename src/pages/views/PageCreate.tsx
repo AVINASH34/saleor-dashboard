@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { getAttributesAfterFileAttributesUpdate } from "@dashboard/attributes/utils/data";
 import {
   handleUploadMultipleFiles,
@@ -160,6 +161,7 @@ export const PageCreate: React.FC<PageCreateProps> = ({ params }) => {
   const handleAssignAttributeReferenceClick = (attribute: AttributeInput) =>
     navigate(
       pageCreateUrl({
+        ...params,
         action: "assign-attribute-value",
         id: attribute.id,
       }),
@@ -181,8 +183,9 @@ export const PageCreate: React.FC<PageCreateProps> = ({ params }) => {
     onFetchMore: loadMoreProducts,
   };
   const fetchMoreAttributeValues = {
-    hasMore: !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
-      ?.hasNextPage,
+    hasMore:
+      !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
+        ?.hasNextPage,
     loading: !!searchAttributeValuesOpts.loading,
     onFetchMore: loadMoreAttributeValues,
   };
@@ -225,7 +228,9 @@ export const PageCreate: React.FC<PageCreateProps> = ({ params }) => {
         fetchMoreReferenceProducts={fetchMoreReferenceProducts}
         fetchAttributeValues={searchAttributeValues}
         fetchMoreAttributeValues={fetchMoreAttributeValues}
-        onCloseDialog={() => navigate(pageCreateUrl())}
+        onCloseDialog={() =>
+          navigate(pageCreateUrl({ ...params, action: undefined }))
+        }
         selectedPageType={selectedPageType?.pageType}
         onSelectPageType={handleSelectPageTypeId}
         onAttributeSelectBlur={searchAttributeReset}

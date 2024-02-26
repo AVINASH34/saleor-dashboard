@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import AddressEdit from "@dashboard/components/AddressEdit";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import FormSpacer from "@dashboard/components/FormSpacer";
@@ -37,7 +38,9 @@ export interface OrderCustomerAddressEditProps {
   showCard?: boolean;
 }
 
-const OrderCustomerAddressEdit: React.FC<OrderCustomerAddressEditProps> = props => {
+const OrderCustomerAddressEdit: React.FC<
+  OrderCustomerAddressEditProps
+> = props => {
   const {
     loading,
     customerAddresses,
@@ -87,9 +90,7 @@ const OrderCustomerAddressEdit: React.FC<OrderCustomerAddressEditProps> = props 
         control={
           <Radio
             color="primary"
-            data-test-id={
-              addressInputOption + AddressInputOptionEnum.CUSTOMER_ADDRESS
-            }
+            data-test-id={AddressInputOptionEnum.CUSTOMER_ADDRESS}
           />
         }
         label={intl.formatMessage(addressEditMessages.customerAddress)}
@@ -114,9 +115,7 @@ const OrderCustomerAddressEdit: React.FC<OrderCustomerAddressEditProps> = props 
         control={
           <Radio
             color="primary"
-            data-test-id={
-              addressInputOption + AddressInputOptionEnum.NEW_ADDRESS
-            }
+            data-test-id={AddressInputOptionEnum.NEW_ADDRESS}
           />
         }
         label={intl.formatMessage(addressEditMessages.newAddress)}

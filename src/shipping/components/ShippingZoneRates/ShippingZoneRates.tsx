@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import CardTitle from "@dashboard/components/CardTitle";
 import IconButtonTableCell from "@dashboard/components/IconButtonTableCell";
 import Money from "@dashboard/components/Money";
@@ -69,7 +70,11 @@ const ShippingZoneRates: React.FC<ShippingZoneRatesProps> = props => {
   const intl = useIntl();
 
   return (
-    <Card>
+    <Card
+      data-test-id={
+        variant === "price" ? "price-based-rates" : "weight-based-rates"
+      }
+    >
       <CardTitle
         title={
           variant === "price"
@@ -140,6 +145,7 @@ const ShippingZoneRates: React.FC<ShippingZoneRatesProps> = props => {
                   hover={!!rate}
                   key={rate ? rate.id : "skeleton"}
                   href={rate && getRateEditHref(rate.id)}
+                  data-test-id="shipping-method-row"
                 >
                   <TableCell className={classes.nameColumn}>
                     {maybe<React.ReactNode>(() => rate.name, <Skeleton />)}
@@ -189,7 +195,7 @@ const ShippingZoneRates: React.FC<ShippingZoneRatesProps> = props => {
                       onClick={() => onRateRemove(rate.id)}
                       className={classes.buttonColumn}
                     >
-                      <DeleteIcon />
+                      <DeleteIcon data-test-id="delete-button" />
                     </IconButtonTableCell>
                   </TableButtonWrapper>
                 </TableRowLink>

@@ -1,6 +1,7 @@
 import { channel, channelCreateErrors } from "@dashboard/channels/fixtures";
 import { countries } from "@dashboard/fixtures";
 import { ChannelErrorFragment } from "@dashboard/graphql";
+import { SubmitPromise } from "@dashboard/hooks/useForm";
 import React from "react";
 
 import ChannelDetailsPage, {
@@ -15,7 +16,7 @@ const props: ChannelDetailsPageProps<ChannelErrorFragment[]> = {
   disabled: false,
   disabledStatus: false,
   errors: [],
-  onSubmit: () => undefined,
+  onSubmit: async () => undefined as unknown as SubmitPromise,
   saveButtonBarState: "default",
   updateChannelStatus: () => undefined,
   searchShippingZones: () => undefined,

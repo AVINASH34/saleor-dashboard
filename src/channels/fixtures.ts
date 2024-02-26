@@ -5,6 +5,7 @@ import {
   ChannelErrorFragment,
   MarkAsPaidStrategyEnum,
   ProductFragment,
+  TransactionFlowStrategyEnum,
 } from "@dashboard/graphql";
 import { Money } from "@saleor/sdk/dist/apollo/types";
 
@@ -49,7 +50,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -83,7 +90,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -117,7 +130,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -151,7 +170,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -185,7 +210,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -219,7 +250,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
   {
@@ -253,7 +290,13 @@ export const channelsList: ChannelDetailsFragment[] = [
     ],
     orderSettings: {
       markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+      deleteExpiredOrdersAfter: 60,
+      allowUnpaidOrders: false,
       __typename: "OrderSettings",
+    },
+    paymentSettings: {
+      __typename: "PaymentSettings",
+      defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
     },
   },
 ];
@@ -289,11 +332,19 @@ export const channel: ChannelDetailsFragment = {
   ],
   orderSettings: {
     markAsPaidStrategy: MarkAsPaidStrategyEnum.TRANSACTION_FLOW,
+    deleteExpiredOrdersAfter: 60,
+    allowUnpaidOrders: false,
     __typename: "OrderSettings",
+  },
+  paymentSettings: {
+    __typename: "PaymentSettings",
+    defaultTransactionFlowStrategy: TransactionFlowStrategyEnum.CHARGE,
   },
 };
 
-type ProductChannelsWithPricing = ProductFragment["channelListings"][0] & {
+type ProductChannelsWithPricing = NonNullable<
+  ProductFragment["channelListings"]
+>[0] & {
   pricing: {
     priceRange: {
       start: {

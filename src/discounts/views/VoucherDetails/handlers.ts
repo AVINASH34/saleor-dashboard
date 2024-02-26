@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { FetchResult } from "@apollo/client";
 import { ChannelVoucherData } from "@dashboard/channels/utils";
 import { VoucherDetailsPageFormData } from "@dashboard/discounts/components/VoucherDetailsPage";
@@ -34,6 +35,7 @@ export function createUpdateHandler(
       updateVoucher({
         id,
         input: {
+          name: formData.name,
           applyOncePerCustomer: formData.applyOncePerCustomer,
           applyOncePerOrder: formData.applyOncePerOrder,
           onlyForStaff: formData.onlyForStaff,
@@ -56,6 +58,8 @@ export function createUpdateHandler(
               ? VoucherTypeEnum.SHIPPING
               : formData.type,
           usageLimit: formData.hasUsageLimit ? formData.usageLimit : null,
+          singleUse: formData.singleUse,
+          addCodes: formData.codes.map(({ code }) => code),
         },
       }).then(({ data }) => data?.voucherUpdate.errors ?? []),
 

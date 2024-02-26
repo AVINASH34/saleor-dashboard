@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { WindowTitle } from "@dashboard/components/WindowTitle";
 import {
   useOrderDetailsGrantRefundQuery,
@@ -12,6 +13,7 @@ import { orderUrl } from "@dashboard/orders/urls";
 import React from "react";
 import { useIntl } from "react-intl";
 
+import { squashLines } from "../OrderReturn/useRefundWithinReturn";
 import { orderGrantRefundMessages } from "./messages";
 
 interface OrderGrantRefundProps {
@@ -44,13 +46,26 @@ const OrderGrantRefund: React.FC<OrderGrantRefundProps> = ({ orderId }) => {
     },
   });
 
-  const handleSubmit = async ({ amount, reason }: OrderGrantRefundFormData) => {
+  const handleSubmit = async ({
+    amount,
+    reason,
+    lines,
+    grantRefundForShipping,
+  }: OrderGrantRefundFormData) => {
+    // API call should be stoped when use doesn't select any line,
+    // doesn't provide own amount and doesn't want to refund shipping
+    if (lines.length === 0 && amount === undefined && !grantRefundForShipping) {
+      return;
+    }
+
     extractMutationErrors(
       grantRefund({
         variables: {
           orderId,
           amount,
           reason,
+          lines: squashLines(lines),
+          grantRefundForShipping,
         },
       }),
     );

@@ -2,6 +2,7 @@ import { VOUCHERS_SELECTORS } from "../../../elements/discounts/vouchers";
 import { BUTTON_SELECTORS } from "../../../elements/shared/button-selectors";
 import { urlList, voucherDetailsUrl } from "../../../fixtures/urlList";
 import { ONE_PERMISSION_USERS } from "../../../fixtures/users";
+import { ensureCanvasStatic } from "../../../support/customCommands/sharedElementsOperations/canvas";
 import { createCheckoutWithVoucher } from "../../api/utils/ordersUtils";
 import { selectChannelInDetailsPages } from "../channelsPage";
 
@@ -24,12 +25,15 @@ export function createVoucher({
 }) {
   cy.get(VOUCHERS_SELECTORS.createVoucherButton).click();
   selectChannelInDetailsPages(channelName);
-  cy.get(VOUCHERS_SELECTORS.voucherCodeInput)
-    .type(voucherCode)
-    .get(discountOption)
-    .click();
+  cy.get(VOUCHERS_SELECTORS.voucherCodeAddButton).click();
+  cy.get(VOUCHERS_SELECTORS.manualVoucherItem).click();
+  cy.get(VOUCHERS_SELECTORS.voucherCodeNameInput).type(voucherCode);
+  cy.get(VOUCHERS_SELECTORS.voucherCodeConfirmButton).click();
+  cy.get(discountOption).click();
   if (discountOption !== discountOptions.SHIPPING) {
-    cy.get(VOUCHERS_SELECTORS.discountValueInputs).type(voucherValue);
+    cy.get(VOUCHERS_SELECTORS.discountValueInputs).type(voucherValue, {
+      force: true,
+    });
   }
   if (usageLimit) {
     cy.get(VOUCHERS_SELECTORS.limits.usageLimitCheckbox)
@@ -46,7 +50,7 @@ export function createVoucher({
     cy.get(VOUCHERS_SELECTORS.requirements.minOrderValueCheckbox)
       .click()
       .get(VOUCHERS_SELECTORS.requirements.minOrderValueInput)
-      .type(minOrderValue);
+      .type(minOrderValue, { force: true });
   }
   if (minAmountOfItems) {
     cy.get(VOUCHERS_SELECTORS.requirements.minAmountOfItemsCheckbox)
@@ -54,9 +58,7 @@ export function createVoucher({
       .get(VOUCHERS_SELECTORS.requirements.minCheckoutItemsQuantityInput)
       .type(minAmountOfItems);
   }
-  cy.get(BUTTON_SELECTORS.confirm)
-    .click()
-    .confirmationMessageShouldAppear();
+  cy.get(BUTTON_SELECTORS.confirm).click().confirmationMessageShouldAppear();
 }
 
 export function setVoucherDate({
@@ -72,7 +74,7 @@ export function setVoucherDate({
   }
   if (endDate) {
     if (hasEndDate) {
-      cy.get(VOUCHERS_SELECTORS.hasEndDateCheckbox).click();
+      cy.get(VOUCHERS_SELECTORS.hasEndDateCheckbox).click({ force: true });
     }
     cy.get(VOUCHERS_SELECTORS.endDateInput)
       .type(endDate)
@@ -100,7 +102,7 @@ export function loginAndCreateCheckoutForVoucherWithDiscount({
   cy.clearSessionData()
     .loginUserViaRequest("auth", ONE_PERMISSION_USERS.discount)
     .visit(urlList.vouchers);
-  cy.expectSkeletonIsVisible();
+  ensureCanvasStatic();
   createVoucher({
     voucherCode,
     voucherValue,

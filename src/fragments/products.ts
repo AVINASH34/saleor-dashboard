@@ -46,7 +46,7 @@ export const fragmentProductMedia = gql`
     id
     alt
     sortOrder
-    url
+    url(size: 1024)
     type
     oembedData
   }
@@ -102,13 +102,21 @@ export const productFragment = gql`
   fragment ProductWithChannelListings on Product {
     id
     name
-    thumbnail {
+    thumbnail(size: 1024) {
       url
     }
     productType {
       id
       name
       hasVariants
+    }
+    category @include(if: $includeCategories) {
+      id
+      name
+    }
+    collections @include(if: $includeCollections) {
+      id
+      name
     }
     channelListings {
       ...ChannelListingProductWithoutPricing
@@ -149,19 +157,7 @@ export const productVariantAttributesFragment = gql`
     productType {
       id
       variantAttributes {
-        id
-        name
-        inputType
-        valueRequired
-        unit
-        choices(
-          first: $firstValues
-          after: $afterValues
-          last: $lastValues
-          before: $beforeValues
-        ) {
-          ...AttributeValueList
-        }
+        ...VariantAttribute
       }
     }
     channelListings {
@@ -185,8 +181,7 @@ export const productDetailsVariant = gql`
         name
       }
       values {
-        id
-        name
+        ...AttributeValueDetails
       }
     }
     media {
@@ -330,7 +325,7 @@ export const fragmentVariant = gql`
         sku
         media {
           id
-          url
+          url(size: 200)
           type
           oembedData
         }

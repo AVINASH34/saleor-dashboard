@@ -1,5 +1,7 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardTitle from "@dashboard/components/CardTitle";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Grid from "@dashboard/components/Grid";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import Savebar from "@dashboard/components/Savebar";
@@ -25,7 +27,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import {
-  ConfirmButtonTransitionState,
   List,
   ListHeader,
   ListItem,
@@ -34,7 +35,7 @@ import {
   PageTabs,
   SearchIcon,
 } from "@saleor/macaw-ui";
-import { Box } from "@saleor/macaw-ui/next";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -92,21 +93,24 @@ export const TaxCountriesPage: React.FC<TaxCountriesPageProps> = props => {
 
         return (
           <DetailPageLayout gridTemplateColumns={1}>
-            <TopNav title={<TaxPageTitle />} />
+            <TopNav title={<TaxPageTitle />} href={configurationMenuUrl} />
             <DetailPageLayout.Content>
-              <Box padding={9}>
+              <Box padding={6}>
                 <PageTabs value="countries" onChange={handleTabChange}>
                   <PageTab
                     label={intl.formatMessage(taxesMessages.channelsSection)}
                     value="channels"
+                    data-test-id="channels-tab"
                   />
                   <PageTab
                     label={intl.formatMessage(taxesMessages.countriesSection)}
                     value="countries"
+                    data-test-id="countries-tab"
                   />
                   <PageTab
                     label={intl.formatMessage(taxesMessages.taxClassesSection)}
                     value="tax-classes"
+                    data-test-id="tax-classes-tab"
                   />
                 </PageTabs>
                 <VerticalSpacer spacing={2} />
@@ -142,6 +146,7 @@ export const TaxCountriesPage: React.FC<TaxCountriesPageProps> = props => {
                       <>
                         <CardContent>
                           <TextField
+                            data-test-id="search-tax-class-input"
                             value={query}
                             variant="outlined"
                             onChange={e => setQuery(e.target.value)}
@@ -180,6 +185,7 @@ export const TaxCountriesPage: React.FC<TaxCountriesPageProps> = props => {
                               <ListItem
                                 hover={false}
                                 className={classes.noDivider}
+                                data-test-id={rate.label}
                               >
                                 <ListItemCell>{rate.label}</ListItemCell>
                                 <ListItemCell>

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   extensionMountPoints,
   mapToMenuItemsForProductDetails,
@@ -13,6 +14,7 @@ import AssignAttributeValueDialog from "@dashboard/components/AssignAttributeVal
 import { AttributeInput, Attributes } from "@dashboard/components/Attributes";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import ChannelsAvailabilityCard from "@dashboard/components/ChannelsAvailabilityCard";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import { useDevModeContext } from "@dashboard/components/DevModePanel/hooks";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Metadata } from "@dashboard/components/Metadata/Metadata";
@@ -34,26 +36,25 @@ import {
   SearchPagesQuery,
   SearchProductsQuery,
   TaxClassBaseFragment,
-  WarehouseFragment,
 } from "@dashboard/graphql";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { maybe } from "@dashboard/misc";
 import ProductExternalMediaDialog from "@dashboard/products/components/ProductExternalMediaDialog";
+import { ProductOrganization } from "@dashboard/products/components/ProductOrganization/ProductOrganization";
 import { defaultGraphiQLQuery } from "@dashboard/products/queries";
 import { productImageUrl, productListUrl } from "@dashboard/products/urls";
 import { ProductVariantListError } from "@dashboard/products/views/ProductUpdate/handlers/errors";
 import { UseProductUpdateHandlerError } from "@dashboard/products/views/ProductUpdate/handlers/useProductUpdateHandler";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
-import { getChoices } from "../../utils/data";
+import { AttributeValuesMetadata, getChoices } from "../../utils/data";
 import { ProductDetailsForm } from "../ProductDetailsForm";
 import ProductMedia from "../ProductMedia";
-import { ProductOrganization } from "../ProductOrganization";
 import ProductTaxes from "../ProductTaxes";
 import ProductVariants from "../ProductVariants";
 import ProductUpdateForm from "./form";
@@ -86,7 +87,6 @@ export interface ProductUpdatePageProps {
   product: ProductFragment;
   header: string;
   saveButtonBarState: ConfirmButtonTransitionState;
-  warehouses: WarehouseFragment[];
   taxClasses: TaxClassBaseFragment[];
   fetchMoreTaxClasses: FetchMoreProps;
   referencePages?: RelayToFlat<SearchPagesQuery["search"]>;
@@ -112,11 +112,11 @@ export interface ProductUpdatePageProps {
   onSubmit: (data: ProductUpdateSubmitData) => SubmitPromise;
   onVariantShow: (id: string) => void;
   onAttributeSelectBlur: () => void;
-  onDelete();
-  onImageReorder?(event: { oldIndex: number; newIndex: number });
-  onImageUpload(file: File);
-  onMediaUrlUpload(mediaUrl: string);
-  onSeoClick?();
+  onDelete: () => any;
+  onImageReorder?: (event: { oldIndex: number; newIndex: number }) => any;
+  onImageUpload: (file: File) => any;
+  onMediaUrlUpload: (mediaUrl: string) => any;
+  onSeoClick?: () => any;
 }
 
 export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
@@ -140,7 +140,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
   product,
   saveButtonBarState,
   variants,
-  warehouses,
   taxClasses,
   fetchMoreTaxClasses,
   referencePages = [],
@@ -199,7 +198,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
   const canOpenAssignReferencesAttributeDialog = !!assignReferencesAttributeId;
 
   const handleAssignReferenceAttribute = (
-    attributeValues: string[],
+    attributeValues: AttributeValuesMetadata[],
     data: ProductUpdateData,
     handlers: ProductUpdateHandlers,
   ) => {
@@ -207,9 +206,13 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
       assignReferencesAttributeId,
       mergeAttributeValues(
         assignReferencesAttributeId,
-        attributeValues,
+        attributeValues.map(({ value }) => value),
         data.attributes,
       ),
+    );
+    handlers.selectAttributeReferenceMetadata(
+      assignReferencesAttributeId,
+      attributeValues,
     );
     onCloseDialog();
   };
@@ -259,7 +262,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
       setSelectedCollections={setSelectedCollections}
       setSelectedTaxClass={setSelectedTaxClass}
       taxClasses={taxClassesChoices}
-      warehouses={warehouses}
       hasVariants={hasVariants}
       referencePages={referencePages}
       referenceProducts={referenceProducts}
@@ -301,7 +303,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
           openModal: () => setChannelPickerOpen(true),
         };
 
-        const listings = data.channels.updateChannels.map<ChannelData>(
+        const listings = data.channels.updateChannels?.map<ChannelData>(
           listing => {
             const channel = channels?.find(ac => ac.id === listing.channelId);
 
@@ -309,7 +311,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
               ...channel,
               ...listing,
               id: listing.channelId,
-              availableForPurchase: listing.availableForPurchaseDate,
               currency: channel.currencyCode,
             };
           },
@@ -343,7 +344,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 errors={productErrors}
                 onChange={change}
               />
-              <CardSpacer />
               <ProductMedia
                 media={media}
                 onImageDelete={onImageDelete}
@@ -352,7 +352,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 openMediaUrlModal={() => setMediaUrlModalStatus(true)}
                 getImageEditUrl={imageId => productImageUrl(productId, imageId)}
               />
-              <CardSpacer />
               {data.attributes.length > 0 && (
                 <Attributes
                   attributes={data.attributes}
@@ -372,7 +371,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                   richTextGetters={attributeRichTextGetters}
                 />
               )}
-              <CardSpacer />
               <ProductVariants
                 productName={product?.name}
                 errors={variantListErrors}
@@ -380,7 +378,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 limits={limits}
                 variants={variants}
                 variantAttributes={product?.productType.variantAttributes}
-                warehouses={warehouses}
                 onAttributeValuesSearch={onAttributeValuesSearch}
                 onChange={handlers.changeVariants}
                 onRowClick={onVariantShow}
@@ -403,7 +400,6 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                     "Add search engine title and description to make this product easier to find",
                 })}
               />
-              <CardSpacer />
               <Metadata data={data} onChange={handlers.changeMetadata} />
             </DetailPageLayout.Content>
             <DetailPageLayout.RightSidebar>
@@ -424,20 +420,20 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 onCategoryChange={handlers.selectCategory}
                 onCollectionChange={handlers.selectCollection}
               />
-              <CardSpacer />
               <ChannelsAvailabilityCard
                 {...availabilityCommonProps}
-                channels={listings}
+                channels={listings ?? []}
               />
-              <CardSpacer />
-              <ProductTaxes
-                value={data.taxClassId}
-                disabled={disabled}
-                onChange={handlers.selectTaxClass}
-                taxClassDisplayName={selectedTaxClass}
-                taxClasses={taxClasses}
-                onFetchMore={fetchMoreTaxClasses}
-              />
+              <Box paddingBottom={52}>
+                <ProductTaxes
+                  value={data.taxClassId}
+                  disabled={disabled}
+                  onChange={handlers.selectTaxClass}
+                  taxClassDisplayName={selectedTaxClass}
+                  taxClasses={taxClasses}
+                  onFetchMore={fetchMoreTaxClasses}
+                />
+              </Box>
             </DetailPageLayout.RightSidebar>
 
             <Savebar
@@ -453,6 +449,9 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 confirmButtonState={"default"}
                 products={referenceProducts}
                 pages={referencePages}
+                attribute={data.attributes.find(
+                  ({ id }) => id === assignReferencesAttributeId,
+                )}
                 hasMore={handlers.fetchMoreReferences?.hasMore}
                 open={canOpenAssignReferencesAttributeDialog}
                 onFetch={handlers.fetchReferences}
@@ -461,7 +460,10 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 onClose={onCloseDialog}
                 onSubmit={attributeValues =>
                   handleAssignReferenceAttribute(
-                    attributeValues,
+                    attributeValues.map(container => ({
+                      value: container.id,
+                      label: container.name,
+                    })),
                     data,
                     handlers,
                   )

@@ -39,7 +39,7 @@ const VoucherLimits = ({
   const usesLeft = data.usageLimit - data.used;
 
   return (
-    <Card>
+    <Card data-test-id="usage-limit-section">
       <CardTitle title={intl.formatMessage(messages.usageLimitsTitle)} />
       <CardContent className={classes.cardContent}>
         <ControlledCheckbox
@@ -108,6 +108,14 @@ const VoucherLimits = ({
           checked={data.onlyForStaff}
           label={intl.formatMessage(messages.onlyForStaff)}
           name={"onlyForStaff" as keyof VoucherDetailsPageFormData}
+          onChange={onChange}
+        />
+
+        <ControlledCheckbox
+          testId="single-use"
+          checked={data.singleUse}
+          label={intl.formatMessage(messages.singleUse)}
+          name={"singleUse" satisfies keyof VoucherDetailsPageFormData}
           onChange={onChange}
         />
       </CardContent>

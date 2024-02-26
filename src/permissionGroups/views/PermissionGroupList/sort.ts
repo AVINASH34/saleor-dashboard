@@ -9,10 +9,18 @@ export function getSortQueryField(
     case PermissionGroupListUrlSortField.name:
       return PermissionGroupSortField.NAME;
     default:
-      return undefined;
+      return "" as PermissionGroupSortField;
   }
 }
 
-export const getSortQueryVariables = createGetSortQueryVariables(
-  getSortQueryField,
-);
+export const getSortQueryVariables =
+  createGetSortQueryVariables(getSortQueryField);
+
+export function canBeSorted(sort: PermissionGroupListUrlSortField) {
+  switch (sort) {
+    case PermissionGroupListUrlSortField.name:
+      return true;
+    default:
+      return false;
+  }
+}

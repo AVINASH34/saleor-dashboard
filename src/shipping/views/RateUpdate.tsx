@@ -1,4 +1,6 @@
 import {
+  Channel,
+  ChannelShippingData,
   createShippingChannelsFromRate,
   createSortedShippingChannels,
 } from "@dashboard/channels/utils";
@@ -9,6 +11,8 @@ import { DEFAULT_INITIAL_SEARCH_DATA, PAGINATE_BY } from "@dashboard/config";
 import {
   PostalCodeRuleInclusionTypeEnum,
   ShippingMethodTypeEnum,
+  ShippingMethodTypeFragment,
+  ShippingMethodWithPostalCodesFragment,
   useDeleteShippingRateMutation,
   useShippingMethodChannelListingUpdateMutation,
   useShippingPriceExcludeProductMutation,
@@ -57,10 +61,11 @@ import { MinMax } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
+import { ShippingMethodPostalCodeRule } from "@saleor/sdk/dist/apollo/types";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const FORM_ID = Symbol();
+const FORM_ID = Symbol("shipping-zone-rates-details-form-id");
 
 export interface RateUpdateProps {
   id: string;
@@ -77,9 +82,8 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
   const notify = useNotifier();
   const intl = useIntl();
 
-  const [paginationState, setPaginationState] = useLocalPaginationState(
-    PAGINATE_BY,
-  );
+  const [paginationState, setPaginationState] =
+    useLocalPaginationState(PAGINATE_BY);
   const paginate = useLocalPaginator(setPaginationState);
 
   const { data, loading, refetch } = useShippingZoneQuery({
@@ -107,7 +111,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
   );
 
   const { pageInfo, ...paginationValues } = paginate(
-    rate?.excludedProducts.pageInfo,
+    rate?.excludedProducts?.pageInfo,
     paginationState,
   );
 
@@ -116,33 +120,30 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
     updateShippingMethodChannelListingOpts,
   ] = useShippingMethodChannelListingUpdateMutation({});
 
-  const [
-    unassignProduct,
-    unassignProductOpts,
-  ] = useShippingPriceRemoveProductFromExcludeMutation({
-    onCompleted: data => {
-      if (data.shippingPriceRemoveProductFromExclude.errors.length === 0) {
-        handleSuccess();
-        refetch();
-        closeModal();
-      }
-    },
-  });
+  const [unassignProduct, unassignProductOpts] =
+    useShippingPriceRemoveProductFromExcludeMutation({
+      onCompleted: data => {
+        if (data?.shippingPriceRemoveProductFromExclude?.errors.length === 0) {
+          handleSuccess();
+          refetch();
+          closeModal();
+        }
+      },
+    });
 
-  const [
-    assignProduct,
-    assignProductOpts,
-  ] = useShippingPriceExcludeProductMutation({
-    onCompleted: data => {
-      if (data.shippingPriceExcludeProducts.errors.length === 0) {
-        handleSuccess();
-        refetch();
-        closeModal();
-      }
-    },
-  });
+  const [assignProduct, assignProductOpts] =
+    useShippingPriceExcludeProductMutation({
+      onCompleted: data => {
+        if (data?.shippingPriceExcludeProducts?.errors.length === 0) {
+          handleSuccess();
+          refetch();
+          closeModal();
+        }
+      },
+    });
+
   const shippingChannels = createShippingChannelsFromRate(
-    rate?.channelListings,
+    rate?.channelListings as ShippingMethodTypeFragment["channelListings"],
   );
   const allChannels = createSortedShippingChannels(channelsData);
 
@@ -157,7 +158,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
     isChannelsModalOpen,
     setCurrentChannels,
     toggleAllChannels,
-  } = useChannels(
+  } = useChannels<Channel, ShippingRateUrlDialog | undefined>(
     shippingChannels,
     params?.action,
     { closeModal, openModal },
@@ -166,10 +167,8 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
 
   const { taxClasses, fetchMoreTaxClasses } = useTaxClassFetchMore();
 
-  const [
-    updateShippingRate,
-    updateShippingRateOpts,
-  ] = useUpdateShippingRateMutation({});
+  const [updateShippingRate, updateShippingRateOpts] =
+    useUpdateShippingRateMutation({});
 
   const handleSuccess = () => {
     notify({
@@ -177,17 +176,15 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
       text: intl.formatMessage(commonMessages.savedChanges),
     });
   };
-  const [
-    deleteShippingRate,
-    deleteShippingRateOpts,
-  ] = useDeleteShippingRateMutation({
-    onCompleted: data => {
-      if (data.shippingPriceDelete.errors.length === 0) {
-        handleSuccess();
-        navigate(shippingZoneUrl(id));
-      }
-    },
-  });
+  const [deleteShippingRate, deleteShippingRateOpts] =
+    useDeleteShippingRateMutation({
+      onCompleted: data => {
+        if (data?.shippingPriceDelete?.errors.length === 0) {
+          handleSuccess();
+          navigate(shippingZoneUrl(id));
+        }
+      },
+    });
 
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
@@ -195,7 +192,10 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
   const [state, dispatch] = React.useReducer(postalCodesReducer, {
     codesToDelete: [],
     havePostalCodesChanged: false,
-    inclusionType: rate?.postalCodeRules[0]?.inclusionType,
+    inclusionType:
+      (rate?.postalCodeRules?.length &&
+        rate?.postalCodeRules[0].inclusionType) ||
+      undefined,
     originalCodes: [],
     postalCodeRules: rate?.postalCodeRules || [],
   });
@@ -214,7 +214,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
     inclusion: PostalCodeRuleInclusionTypeEnum,
   ) => {
     dispatch({
-      codesToDelete: rate.postalCodeRules.map(code => code.id),
+      codesToDelete: rate?.postalCodeRules?.map(code => code.id),
       havePostalCodesChanged: true,
       inclusionType: inclusion,
       postalCodeRules: [],
@@ -223,9 +223,9 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
 
   const updateData = async (
     formData: ShippingZoneRateUpdateFormData,
-  ): Promise<unknown[]> => {
+  ): Promise<unknown[] | undefined> => {
     const getUpdateVariables =
-      rate!.type === ShippingMethodTypeEnum.PRICE
+      rate?.type === ShippingMethodTypeEnum.PRICE
         ? getUpdateShippingPriceRateVariables
         : getUpdateShippingWeightRateVariables;
     const response = await updateShippingRate({
@@ -233,16 +233,16 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
         formData,
         id,
         rateId,
-        state.postalCodeRules,
-        state.codesToDelete,
+        state?.postalCodeRules!,
+        state?.codesToDelete!,
       ),
     });
 
     dispatch({ codesToDelete: [] });
 
-    const errors = response.data.shippingPriceUpdate.errors;
+    const errors = response?.data?.shippingPriceUpdate?.errors;
 
-    if (errors.length === 0) {
+    if (errors?.length === 0) {
       handleSuccess();
       dispatch({ havePostalCodesChanged: false });
       updateShippingMethodChannelListing({
@@ -259,7 +259,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
   };
 
   const handleSubmit = createMetadataUpdateHandler(
-    rate,
+    rate!,
     updateData,
     variables => updateMetadata({ variables }),
     variables => updatePrivateMetadata({ variables }),
@@ -278,31 +278,37 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
   };
 
   const onPostalCodeAssign = (rule: MinMax) => {
-    if (!state.originalCodes.length) {
-      dispatch({ originalCodes: rate.postalCodeRules });
+    if (!state?.originalCodes?.length) {
+      dispatch({ originalCodes: rate?.postalCodeRules });
     }
 
     if (
-      state.postalCodeRules.filter(getPostalCodeRuleByMinMax(rule)).length > 0
+      state?.postalCodeRules!.filter(getPostalCodeRuleByMinMax(rule)).length > 0
     ) {
       closeModal();
       return;
     }
 
-    const newCode = getRuleObject(rule, state.inclusionType);
+    const newCode = getRuleObject(
+      rule,
+      state?.inclusionType!,
+    ) as unknown as NonNullable<
+      ShippingMethodWithPostalCodesFragment["postalCodeRules"]
+    >[number];
+
     dispatch({
       havePostalCodesChanged: true,
-      postalCodeRules: [...state.postalCodeRules, newCode],
+      postalCodeRules: [...state.postalCodeRules!, newCode],
     });
     closeModal();
   };
 
-  const onPostalCodeUnassign = code => {
+  const onPostalCodeUnassign = (code: ShippingMethodPostalCodeRule) => {
     if (code.id !== undefined) {
       dispatch({
-        codesToDelete: [...state.codesToDelete, code.id],
+        codesToDelete: [...state.codesToDelete!, code.id],
         havePostalCodesChanged: true,
-        postalCodeRules: state.postalCodeRules.filter(
+        postalCodeRules: state.postalCodeRules!.filter(
           getByUnmatchingId(code.id),
         ),
       });
@@ -345,7 +351,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
           })
         }
         open={params.action === "remove"}
-        name={rate?.name}
+        name={rate?.name!}
       />
       <UnassignDialog
         open={params.action === "unassign-product" && !!listElements.length}
@@ -358,10 +364,12 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
         confirmButtonState={assignProductOpts.status}
         loading={productsSearchOpts.loading}
         open={params.action === "assign-product"}
-        hasMore={productsSearchOpts.data?.search?.pageInfo.hasNextPage}
-        products={mapEdgesToItems(productsSearchOpts?.data?.search)?.filter(
-          suggestedProduct => suggestedProduct.id,
-        )}
+        hasMore={productsSearchOpts.data?.search?.pageInfo.hasNextPage!}
+        products={
+          mapEdgesToItems(productsSearchOpts?.data?.search)?.filter(
+            suggestedProduct => suggestedProduct.id,
+          )!
+        }
         onClose={closeModal}
         onFetch={productsSearch}
         onFetchMore={loadMore}
@@ -370,7 +378,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
       <ShippingZoneRatesPage
         formId={FORM_ID}
         allChannelsCount={allChannels?.length}
-        shippingChannels={currentChannels}
+        shippingChannels={currentChannels as ChannelShippingData[]}
         disabled={
           loading ||
           updateShippingRateOpts?.status === "loading" ||
@@ -382,8 +390,8 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
         onDelete={() => openModal("remove")}
         backHref={shippingZoneUrl(id)}
         onSubmit={handleSubmit}
-        rate={rate}
-        errors={updateShippingRateOpts.data?.shippingPriceUpdate.errors || []}
+        rate={rate!}
+        errors={updateShippingRateOpts.data?.shippingPriceUpdate?.errors || []}
         channelErrors={
           updateShippingMethodChannelListingOpts?.data
             ?.shippingMethodChannelListingUpdate?.errors || []
@@ -392,7 +400,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
         onChannelsChange={setCurrentChannels}
         onProductUnassign={handleProductUnassign}
         onProductAssign={() => openModal("assign-product")}
-        variant={rate?.type}
+        variant={rate?.type!}
         isChecked={isSelected}
         selected={listElements.length}
         toggle={toggle}
@@ -409,7 +417,7 @@ export const RateUpdate: React.FC<RateUpdateProps> = ({
         onPostalCodeInclusionChange={onPostalCodeInclusionChange}
         onPostalCodeAssign={() => openModal("add-range")}
         onPostalCodeUnassign={onPostalCodeUnassign}
-        postalCodeRules={state.postalCodeRules}
+        postalCodeRules={state.postalCodeRules!}
         taxClasses={taxClasses ?? []}
         fetchMoreTaxClasses={fetchMoreTaxClasses}
       />

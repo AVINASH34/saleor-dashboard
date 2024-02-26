@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
 import Skeleton from "@dashboard/components/Skeleton";
 import TableRowLink from "@dashboard/components/TableRowLink";
@@ -5,7 +6,7 @@ import { LanguageFragment } from "@dashboard/graphql";
 import { languageEntitiesUrl } from "@dashboard/translations/urls";
 import { Card, CardContent, TableBody, TableCell } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { vars } from "@saleor/macaw-ui-next";
 import { clsx } from "clsx";
 import React from "react";
 import { FormattedMessage } from "react-intl";
@@ -29,7 +30,7 @@ const useStyles = makeStyles(
     },
     rowLink: {
       "& .MuiTableCell-root": {
-        paddingLeft: `${vars.space[9]} !important`,
+        paddingLeft: `${vars.spacing[6]} !important`,
       },
     },
   },

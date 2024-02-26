@@ -33,7 +33,9 @@ export interface ShippingZoneSettingsCardProps {
   loading: boolean;
 }
 
-export const ShippingZoneSettingsCard: React.FC<ShippingZoneSettingsCardProps> = ({
+export const ShippingZoneSettingsCard: React.FC<
+  ShippingZoneSettingsCardProps
+> = ({
   formData,
   warehousesDisplayValues,
   hasMoreWarehouses,
@@ -52,7 +54,7 @@ export const ShippingZoneSettingsCard: React.FC<ShippingZoneSettingsCardProps> =
   return (
     <Card>
       <CardTitle title={intl.formatMessage(messages.title)} />
-      <CardContent>
+      <CardContent data-test-id="channel-section">
         <ChannelsSection
           channelsDisplayValues={channelsDisplayValues}
           onChange={onChannelChange}
@@ -61,7 +63,7 @@ export const ShippingZoneSettingsCard: React.FC<ShippingZoneSettingsCardProps> =
         />
       </CardContent>
       <Divider />
-      <CardContent>
+      <CardContent data-test-id="warehouse-section">
         <WarehousesSection
           onAdd={onWarehouseAdd}
           onSearchChange={onWarehousesSearchChange}

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { getAttributesAfterFileAttributesUpdate } from "@dashboard/attributes/utils/data";
 import {
   handleUploadMultipleFiles,
@@ -91,10 +92,8 @@ export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
 
-  const [
-    reorderProductVariants,
-    reorderProductVariantsOpts,
-  ] = useProductVariantReorderMutation({});
+  const [reorderProductVariants, reorderProductVariantsOpts] =
+    useProductVariantReorderMutation({});
 
   const handleVariantReorder = createVariantReorderHandler(
     product,
@@ -182,6 +181,7 @@ export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
   const handleAssignAttributeReferenceClick = (attribute: AttributeInput) =>
     navigate(
       productVariantAddUrl(productId, {
+        ...params,
         action: "assign-attribute-value",
         id: attribute.id,
       }),
@@ -219,8 +219,9 @@ export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
     onFetchMore: loadMoreProducts,
   };
   const fetchMoreAttributeValues = {
-    hasMore: !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
-      ?.hasNextPage,
+    hasMore:
+      !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
+        ?.hasNextPage,
     loading: !!searchAttributeValuesOpts.loading,
     onFetchMore: loadMoreAttributeValues,
   };

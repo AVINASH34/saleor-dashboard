@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { createConfigurationMenu } from "@dashboard/configuration";
 import { UserFragment } from "@dashboard/graphql";
 import { staffMember } from "@dashboard/staff/fixtures";
@@ -23,6 +24,9 @@ const user = {
   lastName: "Newton",
   note: null,
   userPermissions: staffMember.userPermissions,
+  restrictedAccessToChannels: false,
+  accessibleChannels: [],
+  metadata: [],
 };
 
 const versions = {

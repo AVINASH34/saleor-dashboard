@@ -1,6 +1,8 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardMenu from "@dashboard/components/CardMenu";
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import { DateTime } from "@dashboard/components/Date";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import Savebar from "@dashboard/components/Savebar";
@@ -18,8 +20,7 @@ import OrderChannelSectionCard from "@dashboard/orders/components/OrderChannelSe
 import { orderDraftListUrl } from "@dashboard/orders/urls";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
 import { Typography } from "@material-ui/core";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
-import { Box } from "@saleor/macaw-ui/next";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -49,11 +50,12 @@ export interface OrderDraftPageProps extends FetchMoreProps {
   onShippingAddressEdit: () => void;
   onShippingMethodEdit: () => void;
   onProfileView: () => void;
+  onShowMetadata: (id: string) => void;
 }
 
 const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
   const {
-    disabled,
+    loading,
     fetchUsers,
     hasMore,
     saveButtonBarState,
@@ -69,6 +71,7 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
     onShippingAddressEdit,
     onShippingMethodEdit,
     onProfileView,
+    onShowMetadata,
     order,
     channelUsabilityData,
     users,
@@ -84,7 +87,7 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
       <TopNav
         href={orderDraftListUrl()}
         title={
-          <Box display="flex" alignItems="center" gap={6}>
+          <Box display="flex" alignItems="center" gap={3}>
             <span>{order?.number ? "#" + order?.number : undefined}</span>
             <div>
               {order && order.created ? (
@@ -120,10 +123,12 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
           order={order as OrderDetailsFragment}
           channelUsabilityData={channelUsabilityData}
           errors={errors}
+          loading={loading}
           onOrderLineAdd={onOrderLineAdd}
           onOrderLineChange={onOrderLineChange}
           onOrderLineRemove={onOrderLineRemove}
           onShippingMethodEdit={onShippingMethodEdit}
+          onShowMetadata={onShowMetadata}
         />
         <OrderHistory
           history={order?.events}
@@ -152,7 +157,7 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
       </DetailPageLayout.RightSidebar>
       <Savebar
         state={saveButtonBarState}
-        disabled={disabled}
+        disabled={loading}
         onCancel={() => navigate(orderDraftListUrl())}
         onSubmit={onDraftFinalize}
         labels={{

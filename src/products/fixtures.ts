@@ -1,11 +1,15 @@
+// @ts-strict-ignore
 import { channelsList } from "@dashboard/channels/fixtures";
 import {
+  AttributeEntityTypeEnum,
   AttributeInputTypeEnum,
+  GridAttributesQuery,
   ProductFragment,
   ProductListQuery,
   ProductMediaType,
   ProductVariantCreateDataQuery,
   ProductVariantFragment,
+  VariantAttributeFragment,
   WeightUnitsEnum,
 } from "@dashboard/graphql";
 import { RelayToFlat } from "@dashboard/types";
@@ -477,6 +481,8 @@ export const product: (
         inputType: AttributeInputTypeEnum.DROPDOWN,
         valueRequired: false,
         unit: null,
+        slug: "attachment",
+        entityType: AttributeEntityTypeEnum.PRODUCT,
         choices: {
           __typename: "AttributeValueCountableConnection",
           pageInfo: {
@@ -516,6 +522,8 @@ export const product: (
         __typename: "Attribute",
         id: "pta18161",
         name: "Color",
+        slug: "color",
+        entityType: AttributeEntityTypeEnum.PRODUCT,
         inputType: AttributeInputTypeEnum.DROPDOWN,
         valueRequired: false,
         unit: null,
@@ -615,6 +623,19 @@ export const product: (
             {
               id: "QXR0cmlidXRlVmFsdWU6NDc=",
               name: "1l",
+              plainText: "",
+              richText: "",
+              slug: "",
+              reference: "",
+              boolean: false,
+              date: "",
+              dateTime: "",
+              value: "",
+              file: {
+                __typename: "File",
+                url: "",
+                contentType: "",
+              },
               __typename: "AttributeValue",
             },
           ],
@@ -770,6 +791,19 @@ export const product: (
             {
               id: "QXR0cmlidXRlVmFsdWU6NDg=",
               name: "2l",
+              plainText: "",
+              richText: "",
+              slug: "",
+              reference: "",
+              boolean: false,
+              date: "",
+              dateTime: "",
+              value: "",
+              file: {
+                __typename: "File",
+                url: "",
+                contentType: "",
+              },
               __typename: "AttributeValue",
             },
           ],
@@ -858,6 +892,19 @@ export const product: (
             {
               id: "QXR0cmlidXRlVmFsdWU6NDY=",
               name: "500ml",
+              plainText: "",
+              richText: "",
+              slug: "",
+              reference: "",
+              boolean: false,
+              date: "",
+              dateTime: "",
+              value: "",
+              file: {
+                __typename: "File",
+                url: "",
+                contentType: "",
+              },
               __typename: "AttributeValue",
             },
           ],
@@ -997,6 +1044,182 @@ export const product: (
       quantityLimitPerCustomer: null,
       __typename: "ProductVariant",
     },
+    {
+      id: "UHJvZHVjdFZhcmlhbnQ6MjA0",
+      sku: "76432981",
+      name: "750ml",
+      margin: 0.25,
+      attributes: [
+        {
+          attribute: {
+            id: "QXR0cmlidXRlOjE2",
+            name: "Bottle Size",
+            __typename: "Attribute",
+          },
+          values: [
+            {
+              id: "QXR0cmlidXRlVmFsdWU6NTU=",
+              name: "750ml",
+              plainText: "",
+              richText: "",
+              slug: "",
+              reference: "",
+              boolean: false,
+              date: "",
+              dateTime: "",
+              value: "",
+              file: {
+                __typename: "File",
+                url: "",
+                contentType: "",
+              },
+              __typename: "AttributeValue",
+            },
+          ],
+          __typename: "SelectedAttribute",
+        },
+      ],
+      media: [
+        {
+          id: "2",
+          type: ProductMediaType.VIDEO,
+          url: "randomVideoUrl",
+          __typename: "ProductMedia",
+        },
+      ],
+      stocks: [
+        {
+          id: "U3RvY2s6MTYz",
+          quantity: 600,
+          quantityAllocated: 50,
+          warehouse: {
+            id: "V2FyZWhvdXNlOjEwM2VjNzY2LTA1NmItNDU2My05YjQzLTUxYmU5ZGJmNGEzYQ==",
+            name: "Warehouse-123",
+            __typename: "Warehouse",
+          },
+          __typename: "Stock",
+        },
+      ],
+      trackInventory: true,
+      preorder: null,
+      channelListings: [
+        {
+          id: "UHJvZHVjdFZhcmlhbnRDaSAD3w2FubmVsTGlzdGluZzoyNzU=",
+          channel: {
+            id: "Q2hhbm5lbDox",
+            name: "Channel-EUR",
+            currencyCode: "EUR",
+            __typename: "Channel",
+          },
+          price: {
+            amount: 7.5,
+            currency: "EUR",
+            __typename: "Money",
+          },
+          costPrice: {
+            amount: 2.5,
+            currency: "EUR",
+            __typename: "Money",
+          },
+          preorderThreshold: {
+            quantity: null,
+            soldUnits: 0,
+            __typename: "PreorderThreshold",
+          },
+          __typename: "ProductVariantChannelListing",
+        },
+      ],
+      quantityLimitPerCustomer: 5,
+      __typename: "ProductVariant",
+    },
+    {
+      id: "UHJvZHVjdFZhcmlhbnQ6MjA1",
+      sku: "12345678",
+      name: "1 Liter",
+      margin: 0.15,
+      attributes: [
+        {
+          attribute: {
+            id: "QXR0cmlidXRlOjE3",
+            name: "Bottle Size",
+            __typename: "Attribute",
+          },
+          values: [
+            {
+              id: "QXR0cmlidXRlVmFsdWU6NjU=",
+              name: "1 Liter",
+              plainText: "",
+              richText: "",
+              slug: "",
+              reference: "",
+              boolean: false,
+              date: "",
+              dateTime: "",
+              value: "",
+              file: {
+                __typename: "File",
+                url: "",
+                contentType: "",
+              },
+              __typename: "AttributeValue",
+            },
+          ],
+          __typename: "SelectedAttribute",
+        },
+      ],
+      media: [
+        {
+          id: "3",
+          type: ProductMediaType.IMAGE,
+          url: "randomImageUrl",
+          __typename: "ProductMedia",
+        },
+      ],
+      stocks: [
+        {
+          id: "U3RvY2s6MTY0",
+          quantity: 800,
+          quantityAllocated: 100,
+          warehouse: {
+            id: "V2FyZWhvdXNlOjExNmQ2NGYyLTZhOGYtNGE4MC1iNmJkLTk1MDg4YTliZDEwYQ==",
+            name: "Warehouse-456",
+            __typename: "Warehouse",
+          },
+          __typename: "Stock",
+        },
+      ],
+      trackInventory: true,
+      preorder: null,
+      channelListings: [
+        {
+          id: "UHJvZHVjdFZhcmlhbnRDaSAD3w2FubmVsTGlzdGluZzoyNzY=",
+          channel: {
+            id: "Q2hhbm5lbDoy",
+            name: "Channel-GBP",
+            currencyCode: "GBP",
+            __typename: "Channel",
+          },
+          price: {
+            amount: 10.0,
+            currency: "GBP",
+            __typename: "Money",
+          },
+          costPrice: {
+            amount: 2.0,
+            currency: "GBP",
+            __typename: "Money",
+          },
+          preorderThreshold: {
+            quantity: null,
+            soldUnits: 0,
+            __typename: "PreorderThreshold",
+          },
+          __typename: "ProductVariantChannelListing",
+        },
+      ],
+      quantityLimitPerCustomer: null,
+      __typename: "ProductVariant",
+    },
   ],
   visibleInListings: true,
   weight: {
@@ -1100,6 +1323,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1193,6 +1418,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1286,6 +1513,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1401,6 +1630,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1516,6 +1747,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1632,6 +1865,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1747,6 +1982,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1862,6 +2099,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -1977,6 +2216,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2092,6 +2333,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2207,6 +2450,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2322,6 +2567,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2437,6 +2684,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2552,6 +2801,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2667,6 +2918,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2782,6 +3035,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -2897,6 +3152,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -3012,6 +3269,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -3127,6 +3386,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
   {
     __typename: "Product",
@@ -3242,6 +3503,8 @@ export const products = (
       __typename: "Image",
       url: placeholderImage,
     },
+    category: null,
+    collections: [],
   },
 ];
 
@@ -3844,5 +4107,199 @@ export const productTypesList: Array<
     hasVariants: true,
     id: "UHJvZHVjdFR5cGU6Nw==",
     name: "Mushroom",
+  },
+];
+
+export const gridAttributesResult: GridAttributesQuery = {
+  __typename: "Query",
+  availableAttributes: {
+    __typename: "AttributeCountableConnection",
+    edges: [
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjIx",
+          name: "ABV",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjI3",
+          name: "Author",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjE1",
+          name: "Bottle Size",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjE4",
+          name: "Bucket Size",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjE0",
+          name: "Color",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjIy",
+          name: "Cushion Size",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjY3Nw==",
+          name: "CyCreateProduct-33370",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjY3Ng==",
+          name: "CyCreateProduct-66614",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjY3OQ==",
+          name: "CyCreateVariants-18905",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjY4MA==",
+          name: "CyCreateVariants-9040",
+        },
+      },
+    ],
+    pageInfo: {
+      __typename: "PageInfo",
+      endCursor: "WyIwIiwgImN5Y3JlYXRldmFyaWFudHMtOTA0MCJd",
+      hasNextPage: true,
+      hasPreviousPage: false,
+      startCursor: "WyIwIiwgImFidiJd",
+    },
+  },
+  selectedAttributes: {
+    __typename: "AttributeCountableConnection",
+    edges: [
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjIx",
+          name: "ABV",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjI3",
+          name: "Author",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjE1",
+          name: "Bottle Size",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjMw",
+          name: "Details",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjI1",
+          name: "Format",
+        },
+      },
+      {
+        __typename: "AttributeCountableEdge",
+        node: {
+          __typename: "Attribute",
+          id: "QXR0cmlidXRlOjI2",
+          name: "Publisher",
+        },
+      },
+    ],
+  },
+};
+
+export const variantAttributes: VariantAttributeFragment[] = [
+  {
+    __typename: "Attribute",
+    id: "QXR0cmlidXRlOjE1",
+    name: "Bottle size",
+    slug: "bottle-size",
+    inputType: AttributeInputTypeEnum.DROPDOWN,
+    entityType: null,
+    valueRequired: false,
+    unit: null,
+    choices: {
+      __typename: "AttributeValueCountableConnection",
+      pageInfo: {
+        __typename: "PageInfo",
+        endCursor: "WyI1IiwgIjg1Il0=",
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: "WyIwIiwgIjYzIl0=",
+      },
+      edges: [],
+    },
+  },
+  {
+    __typename: "Attribute",
+    id: "QXR0cmlidXRlOjY4MQ==",
+    name: "Plain text",
+    slug: "plain-text",
+    inputType: AttributeInputTypeEnum.PLAIN_TEXT,
+    entityType: null,
+    valueRequired: false,
+    unit: null,
+    choices: {
+      __typename: "AttributeValueCountableConnection",
+      pageInfo: {
+        __typename: "PageInfo",
+        endCursor: "WyI1IiwgIjg1Il0=",
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: "WyIwIiwgIjYzIl0=",
+      },
+      edges: [],
+    },
   },
 ];

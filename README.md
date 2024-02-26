@@ -17,10 +17,11 @@
   <a href="https://saleor.io/blog/">📰 Blog</a>
   <span> • </span>
   <a href="https://twitter.com/getsaleor">🐦 Twitter</a>
+  <span> • </span>
+  <a href="https://discord.gg/H52JTZAtSH">💬 Discord</a>
 </div>
 
 <div align="center">
-  <a href="https://demo.saleor.io/dashboard">▶️ Demo</a>
    <span> • </span>
   <a href="https://githubbox.com/saleor/saleor-dashboard">🔎 Explore Code</a>
 </div>

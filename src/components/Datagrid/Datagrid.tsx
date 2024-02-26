@@ -14,10 +14,11 @@ import DataEditor, {
   GridSelection,
   HeaderClickedEventArgs,
   Item,
+  Theme,
 } from "@glideapps/glide-data-grid";
 import { GetRowThemeCallback } from "@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render";
 import { Card, CardContent, CircularProgress } from "@material-ui/core";
-import { Box, Text, useTheme } from "@saleor/macaw-ui/next";
+import { Box, Text, useTheme } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import range from "lodash/range";
 import React, {
@@ -32,9 +33,7 @@ import React, {
 } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { contentMaxWidth } from "../AppLayout/consts";
 import { CardMenuItem } from "../CardMenu";
-import { ColumnPickerProps } from "../ColumnPicker";
 import { FullScreenContainer } from "./components/FullScreenContainer";
 import { Header } from "./components/Header";
 import { RowActions } from "./components/RowActions";
@@ -55,10 +54,7 @@ import useStyles, {
   useFullScreenStyles,
 } from "./styles";
 import { AvailableColumn } from "./types";
-import {
-  getDefultColumnPickerProps,
-  preventRowClickOnSelectionCheckbox,
-} from "./utils";
+import { preventRowClickOnSelectionCheckbox } from "./utils";
 
 export interface GetCellContentOpts {
   changes: MutableRefObject<DatagridChange[]>;
@@ -72,6 +68,7 @@ export interface MenuItemsActions {
 }
 
 export interface DatagridProps {
+  fillHandle?: boolean;
   addButtonLabel?: string;
   availableColumns: readonly AvailableColumn[];
   emptyText: string;
@@ -89,9 +86,7 @@ export interface DatagridProps {
   ) => ReactNode;
   onChange?: OnDatagridChange;
   onHeaderClicked?: (colIndex: number, event: HeaderClickedEventArgs) => void;
-  renderColumnPicker?: (
-    defaultProps: Partial<ColumnPickerProps>,
-  ) => ReactElement;
+  renderColumnPicker?: () => ReactElement;
   onRowClick?: (item: Item) => void;
   onColumnMoved?: (startIndex: number, endIndex: number) => void;
   onColumnResize?: (column: GridColumn, newSize: number) => void;
@@ -102,7 +97,12 @@ export interface DatagridProps {
   freezeColumns?: DataEditorProps["freezeColumns"];
   verticalBorder?: DataEditorProps["verticalBorder"];
   columnSelect?: DataEditorProps["columnSelect"];
+  showEmptyDatagrid?: boolean;
   rowAnchor?: (item: Item) => string;
+  rowHeight?: number | ((index: number) => number);
+  actionButtonPosition?: "left" | "right";
+  recentlyAddedColumn?: string | null; // Enables scroll to recently added column
+  onClearRecentlyAddedColumn?: () => void;
 }
 
 export const Datagrid: React.FC<DatagridProps> = ({
@@ -128,14 +128,19 @@ export const Datagrid: React.FC<DatagridProps> = ({
   columnSelect = "none",
   onColumnMoved,
   onColumnResize,
+  showEmptyDatagrid = false,
   loading,
   rowAnchor,
   hasRowHover = false,
   onRowSelectionChange,
+  actionButtonPosition = "left",
+  recentlyAddedColumn,
+  onClearRecentlyAddedColumn,
+  rowHeight = cellHeight,
   ...datagridProps
 }): ReactElement => {
-  const classes = useStyles();
-  const { themeValues } = useTheme();
+  const classes = useStyles({ actionButtonPosition });
+  const { themeValues, theme } = useTheme();
   const datagridTheme = useDatagridTheme(readonly, readonly);
   const editor = useRef<DataEditorRef | null>(null);
   const customRenderers = useCustomCellRenderers();
@@ -145,10 +150,6 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
   const { scrolledToRight, scroller } = useScrollRight();
 
-  const defualtColumnPickerProps = getDefultColumnPickerProps(
-    classes.ghostIcon,
-  );
-
   const fullScreenClasses = useFullScreenStyles(classes);
   const { isOpen, isAnimationOpenFinished, toggle } = useFullScreenMode();
 
@@ -156,6 +157,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
   const [selection, setSelection] = useState<GridSelection>();
   const [hoverRow, setHoverRow] = useState<number | undefined>(undefined);
+  const [areCellsDirty, setCellsDirty] = useState(true);
 
   // Allow to listen to which row is selected and notfiy parent component
   useEffect(() => {
@@ -166,6 +168,27 @@ export const Datagrid: React.FC<DatagridProps> = ({
       });
     }
   }, [onRowSelectionChange, selection]);
+
+  useEffect(() => {
+    if (recentlyAddedColumn && editor.current) {
+      const columnIndex = availableColumns.findIndex(
+        column => column.id === recentlyAddedColumn,
+      );
+
+      if (columnIndex === -1) {
+        return;
+      }
+
+      const datagridScroll = editor.current.scrollTo;
+      datagridScroll(columnIndex, 0, "horizontal", 0, 0, { hAlign: "start" });
+
+      // This is required to disable scroll whenever availableColumns
+      // change (e.g. columns resized, reordered, removed)
+      if (typeof onClearRecentlyAddedColumn === "function") {
+        onClearRecentlyAddedColumn();
+      }
+    }
+  }, [recentlyAddedColumn, availableColumns, editor]);
 
   usePortalClasses({ className: classes.portal });
   usePreventHistoryBack(scroller);
@@ -178,7 +201,12 @@ export const Datagrid: React.FC<DatagridProps> = ({
     removed,
     getChangeIndex,
     onRowAdded,
-  } = useDatagridChange(availableColumns, rows, onChange);
+  } = useDatagridChange(
+    availableColumns,
+    rows,
+    onChange,
+    (areCellsDirty: boolean) => setCellsDirty(areCellsDirty),
+  );
 
   const rowsTotal = rows - removed.length + added.length;
   const hasMenuItem = !!menuItems(0).length;
@@ -197,30 +225,36 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
       return {
         ...getCellContent(item, opts),
-        ...(changed
+        ...(changed && areCellsDirty
           ? {
               themeOverride: {
-                bgCell: themeValues.colors.background.surfaceBrandSubdued,
+                bgCell:
+                  // Consider moving this to MacawUI if we need it in other places
+                  theme === "defaultLight"
+                    ? "hsla(215, 100%, 96%, 1)"
+                    : "hsla(215, 100%, 21%, 1)",
               },
             }
           : {}),
         ...(getCellError(item, opts)
           ? {
               themeOverride: {
-                bgCell: themeValues.colors.background.surfaceCriticalDepressed,
+                bgCell: themeValues.colors.background.critical1,
               },
             }
           : {}),
       };
     },
     [
-      availableColumns,
       changes,
       added,
       removed,
       getChangeIndex,
+      availableColumns,
       getCellContent,
-      themeValues,
+      areCellsDirty,
+      themeValues.colors.background.accent1,
+      themeValues.colors.background.critical1,
       getCellError,
     ],
   );
@@ -244,7 +278,9 @@ export const Datagrid: React.FC<DatagridProps> = ({
   const handleRowHover = useCallback(
     (args: GridMouseEventArgs) => {
       if (hasRowHover) {
-        setHoverRow(args.kind !== "cell" ? undefined : args.location[1]);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, row] = args.location;
+        setHoverRow(args.kind !== "cell" ? undefined : row);
       }
 
       // the code below is responsible for adding native <a> element when hovering over rows in the datagrid
@@ -308,17 +344,19 @@ export const Datagrid: React.FC<DatagridProps> = ({
         return undefined;
       }
 
-      const overrideTheme = {
+      const overrideTheme: Partial<Theme> = {
+        /*
+          Grid-specific colors. Transparency matters when we highlight entire row.
+        */
         bgCell:
-          themeValues.colors.background.interactiveNeutralSecondaryHovering,
-        bgCellMedium:
-          themeValues.colors.background.interactiveNeutralSecondaryHovering,
-        accentLight: undefined as string | undefined,
+          theme === "defaultLight"
+            ? "hsla(220, 18%, 97%, 1)"
+            : "hsla(211, 32%, 19%, 1)",
+        bgCellMedium: themeValues.colors.background.default1Hovered,
       };
 
       if (readonly) {
-        overrideTheme.accentLight =
-          themeValues.colors.background.surfaceNeutralHighlight;
+        overrideTheme.accentLight = themeValues.colors.background.default1;
       }
 
       return overrideTheme;
@@ -415,7 +453,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" marginY={12}>
+      <Box display="flex" justifyContent="center" marginY={9}>
         <CircularProgress />
       </Box>
     );
@@ -451,22 +489,25 @@ export const Datagrid: React.FC<DatagridProps> = ({
             )}
           </Header>
         )}
-        <CardContent classes={{ root: classes.cardContentRoot }}>
-          {rowsTotal > 0 ? (
+        <CardContent
+          classes={{ root: classes.cardContentRoot }}
+          data-test-id="list"
+        >
+          {rowsTotal > 0 || showEmptyDatagrid ? (
             <>
-              {selection?.rows && selection?.rows.length > 0 && (
-                <div className={classes.actionBtnBar}>
-                  {selectionActionsComponent}
-                </div>
-              )}
+              {selection?.rows &&
+                selection?.rows.length > 0 &&
+                selectionActionsComponent && (
+                  <div className={classes.actionBtnBar}>
+                    {selectionActionsComponent}
+                  </div>
+                )}
               <div className={classes.editorContainer}>
                 <Box
-                  backgroundColor="plain"
+                  backgroundColor="default1"
                   borderTopWidth={1}
                   borderTopStyle="solid"
-                  borderColor="neutralPlain"
-                  __maxWidth={contentMaxWidth}
-                  margin="auto"
+                  borderColor="default1"
                 />
                 <DataEditor
                   {...datagridProps}
@@ -495,7 +536,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
                   onItemHovered={handleRowHover}
                   getRowThemeOverride={handleGetThemeOverride}
                   gridSelection={selection}
-                  rowHeight={cellHeight}
+                  rowHeight={rowHeight}
                   headerHeight={cellHeight}
                   ref={editor}
                   onPaste
@@ -520,9 +561,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
                           [classes.columnPickerBackground]: !hasMenuItem,
                         })}
                       >
-                        {renderColumnPicker
-                          ? renderColumnPicker(defualtColumnPickerProps)
-                          : null}
+                        {renderColumnPicker ? renderColumnPicker() : null}
                       </div>
                       {hasColumnGroups && (
                         <div
@@ -541,6 +580,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
                           .fill(0)
                           .map((_, index) => (
                             <RowActions
+                              key={`row-actions-${index}`}
                               menuItems={menuItems(index)}
                               disabled={index >= rowsTotal - added.length}
                             />
@@ -549,16 +589,6 @@ export const Datagrid: React.FC<DatagridProps> = ({
                   }
                   rowMarkerWidth={48}
                 />
-                <Box
-                  position="relative"
-                  backgroundColor="plain"
-                  borderTopWidth={1}
-                  borderTopStyle="solid"
-                  borderColor="neutralPlain"
-                  __maxWidth={contentMaxWidth}
-                  margin="auto"
-                  zIndex="2"
-                />
                 {/* FIXME: https://github.com/glideapps/glide-data-grid/issues/505 */}
                 {hasColumnGroups && (
                   <div className={classes.columnGroupFixer} />
@@ -566,8 +596,10 @@ export const Datagrid: React.FC<DatagridProps> = ({
               </div>
             </>
           ) : (
-            <Box padding={9} textAlign="center">
-              <Text size="small">{emptyText}</Text>
+            <Box padding={6} textAlign="center">
+              <Text data-test-id="empty-data-grid-text" size="small">
+                {emptyText}
+              </Text>
             </Box>
           )}
         </CardContent>
@@ -596,5 +628,4 @@ export const Datagrid: React.FC<DatagridProps> = ({
   );
 };
 
-Datagrid.displayName = "Datagrid";
 export default Datagrid;

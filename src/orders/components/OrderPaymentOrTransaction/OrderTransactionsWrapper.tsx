@@ -1,4 +1,6 @@
+// @ts-strict-ignore
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { useFlag } from "@dashboard/featureFlags";
 import {
   OrderDetailsFragment,
   OrderDetailsQuery,
@@ -10,6 +12,7 @@ import OrderAddTransaction from "../OrderAddTransaction";
 import { useStyles } from "../OrderDetailsPage/styles";
 import OrderGrantedRefunds from "../OrderGrantedRefunds";
 import OrderPaymentSummaryCard from "../OrderPaymentSummaryCard";
+import { OrderRefundDatagrid } from "../OrderRefundDatagrid";
 import OrderSummaryCard from "../OrderSummaryCard";
 import OrderTransaction from "../OrderTransaction";
 import OrderTransactionGiftCard from "../OrderTransactionGiftCard";
@@ -19,11 +22,14 @@ import { getFilteredPayments } from "./utils";
 interface OrderTransactionsWrapper {
   order: OrderDetailsFragment;
   shop: OrderDetailsQuery["shop"];
-  onTransactionAction(transactionId: string, actionType: TransactionActionEnum);
-  onPaymentCapture();
-  onMarkAsPaid();
-  onPaymentVoid();
-  onAddManualTransaction();
+  onTransactionAction: (
+    transactionId: string,
+    actionType: TransactionActionEnum,
+  ) => any;
+  onPaymentCapture: () => any;
+  onMarkAsPaid: () => any;
+  onPaymentVoid: () => any;
+  onAddManualTransaction: () => any;
 }
 
 export const OrderTransactionsWrapper: React.FC<OrderTransactionsWrapper> = ({
@@ -41,6 +47,9 @@ export const OrderTransactionsWrapper: React.FC<OrderTransactionsWrapper> = ({
     () => getFilteredPayments(order),
     [order],
   );
+
+  const { enabled } = useFlag("improved_refunds");
+
   return (
     <>
       <div className={classes.cardGrid}>
@@ -48,12 +57,23 @@ export const OrderTransactionsWrapper: React.FC<OrderTransactionsWrapper> = ({
         <OrderPaymentSummaryCard order={order} onMarkAsPaid={onMarkAsPaid} />
       </div>
       <CardSpacer />
-      {order?.grantedRefunds?.length !== 0 ? (
-        <>
-          <OrderGrantedRefunds order={order} />
-          <CardSpacer />
-        </>
-      ) : null}
+      <>
+        {enabled && (
+          <>
+            <OrderRefundDatagrid
+              orderId={order?.id}
+              grantedRefunds={order?.grantedRefunds}
+            />
+            <CardSpacer />
+          </>
+        )}
+        {order?.grantedRefunds?.length !== 0 && !enabled && (
+          <>
+            <OrderGrantedRefunds order={order} />
+            <CardSpacer />
+          </>
+        )}
+      </>
       <div>
         {order?.transactions?.map(transaction => (
           <OrderTransaction

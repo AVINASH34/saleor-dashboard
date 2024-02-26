@@ -65,6 +65,11 @@ export const orderPaymentMessages = defineMessages({
     defaultMessage: "Voucher",
     description: "voucher type order discount",
   },
+  promotion: {
+    id: "TBdxTP",
+    defaultMessage: "Promotion",
+    description: "promotion type order discount",
+  },
   total: {
     id: "zb4eBO",
     defaultMessage: "Total",
@@ -91,8 +96,8 @@ export const orderPaymentMessages = defineMessages({
     description: "order payment",
   },
   paidWithGiftCard: {
-    id: "vM9quW",
-    defaultMessage: "Paid with Gift Card",
+    id: "yivxZJ",
+    defaultMessage: "Paid with Gift Card: ({link})",
     description: "order payment",
   },
   includedInSubtotal: {

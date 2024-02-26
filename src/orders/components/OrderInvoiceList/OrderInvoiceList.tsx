@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import Date from "@dashboard/components/Date";
@@ -14,7 +15,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { sprinkles } from "@saleor/macaw-ui/next";
+import { sprinkles } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -75,7 +76,7 @@ const OrderInvoiceList: React.FC<OrderInvoiceListProps> = props => {
           onInvoiceGenerate && (
             <Button
               onClick={onInvoiceGenerate}
-              className={sprinkles({ marginRight: 2 })}
+              className={sprinkles({ marginRight: 0.5 })}
             >
               <FormattedMessage
                 id="e0RKe+"

@@ -1,7 +1,10 @@
 import AddressEdit from "@dashboard/components/AddressEdit";
 import { createCountryHandler } from "@dashboard/components/AddressEdit/createCountryHandler";
 import BackButton from "@dashboard/components/BackButton";
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import {
   AccountErrorFragment,
@@ -21,7 +24,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState, makeStyles } from "@saleor/macaw-ui";
+import { makeStyles } from "@saleor/macaw-ui";
 import React from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -92,7 +95,13 @@ const CustomerAddressDialog: React.FC<CustomerAddressDialogProps> = ({
       fullWidth
       maxWidth="sm"
     >
-      <Form initial={initialForm} onSubmit={handleSubmit}>
+      <Form
+        initial={initialForm}
+        onSubmit={data => {
+          setCountryDisplayName("");
+          handleSubmit(data);
+        }}
+      >
         {({ change, set, data }) => {
           const countrySelect = createSingleAutocompleteSelectHandler(
             change,

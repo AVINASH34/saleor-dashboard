@@ -1,46 +1,49 @@
+import {
+  ChannelPriceAndPreorderData,
+  IChannelPriceAndPreorderArgs,
+} from "@dashboard/channels/utils";
+import { Divider } from "@dashboard/components/Divider";
+import { FormsetData } from "@dashboard/hooks/useFormset";
 import React from "react";
-import { useIntl } from "react-intl";
 
-import { variantDetailsChannelsAvailabilityCardMessages as messages } from "./../messages";
-import { Channel, ProductChannelListing } from "./../types";
-import { ChannelsList } from "./ChannelsList";
+import { ProductChannelListing } from "./../types";
 import { ChannelsListItem } from "./ChannelsListItem";
-import { NotAvailable } from "./NotAvailable";
 import CardContainer from "./VariantDetailsChannelsAvailabilityCardContainer";
 
 interface AvailabilityCardProps {
-  items: Channel[];
+  allAvailableListings: FormsetData<
+    ChannelPriceAndPreorderData,
+    IChannelPriceAndPreorderArgs
+  >;
   productChannelListings: ProductChannelListing;
-  availabilityCount: Record<string, number>;
 }
 
 export const AvailabilityCard: React.FC<AvailabilityCardProps> = ({
-  availabilityCount,
-  items,
+  allAvailableListings,
   productChannelListings,
   children,
 }) => {
-  const intl = useIntl();
-  const channelListSummary = intl.formatMessage(
-    messages.subtitle,
-    availabilityCount,
-  );
-
-  if (items.length === 0) {
-    return (
-      <CardContainer cardTitle={children}>
-        <NotAvailable />
-      </CardContainer>
-    );
+  if (allAvailableListings.length === 0) {
+    return <CardContainer cardTitle={children}>{}</CardContainer>;
   }
+
+  const listingIds = allAvailableListings.map(lst => lst.id);
+  const filteredListings: ProductChannelListing =
+    productChannelListings?.filter((channel: ProductChannelListing[0]) =>
+      listingIds.includes(channel.channel.id),
+    );
 
   return (
     <CardContainer cardTitle={children}>
-      <ChannelsList summary={channelListSummary}>
-        {items.map(channel => (
-          <ChannelsListItem {...channel} listings={productChannelListings} />
-        ))}
-      </ChannelsList>
+      {filteredListings.map((listing: ProductChannelListing[0]) => (
+        <ChannelsListItem
+          {...listing}
+          id={listing.channel.id}
+          name={listing.channel.name}
+          key={listing.channel.id}
+        />
+      ))}
+      <Divider />
     </CardContainer>
   );
 };

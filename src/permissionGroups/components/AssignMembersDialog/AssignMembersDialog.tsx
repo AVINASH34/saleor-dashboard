@@ -1,6 +1,10 @@
+// @ts-strict-ignore
 import BackButton from "@dashboard/components/BackButton";
 import CardSpacer from "@dashboard/components/CardSpacer";
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
 import Skeleton from "@dashboard/components/Skeleton";
 import TableRowLink from "@dashboard/components/TableRowLink";
@@ -33,8 +37,8 @@ import {
   TableCell,
   TextField,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState, makeStyles } from "@saleor/macaw-ui";
-import { Box, Text } from "@saleor/macaw-ui/next";
+import { makeStyles } from "@saleor/macaw-ui";
+import { Box, Text } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -246,7 +250,7 @@ const AssignMembersDialog: React.FC<AssignMembersDialogProps> = ({
                           justifyContent="center"
                         >
                           <Text>{getUserName(member) || <Skeleton />}</Text>
-                          <Text variant="caption" color="textNeutralSubdued">
+                          <Text variant="caption" color="default2">
                             {!!member ? (
                               member.isActive ? (
                                 intl.formatMessage(messages.staffActive)

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import placeholderImage from "@assets/images/placeholder60x60.png";
 import { FulfillmentStatus } from "@dashboard/graphql";
 import React from "react";
@@ -219,6 +220,7 @@ const props: OrderGrantRefundPageProps = {
         __typename: "Fulfillment",
       },
     ],
+    grantedRefunds: [],
     shippingPrice: {
       gross: {
         amount: 85.23,

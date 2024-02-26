@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { DashboardCard } from "@dashboard/components/Card";
 import RichTextEditor from "@dashboard/components/RichTextEditor";
 import { RichTextEditorLoading } from "@dashboard/components/RichTextEditor/RichTextEditorLoading";
@@ -6,7 +7,7 @@ import { commonMessages } from "@dashboard/intl";
 import { getFormErrors, getProductErrorMessage } from "@dashboard/utils/errors";
 import { useRichTextContext } from "@dashboard/utils/richText/context";
 import { OutputData } from "@editorjs/editorjs";
-import { Box, Input } from "@saleor/macaw-ui/next";
+import { Box, Input } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -19,7 +20,7 @@ interface ProductDetailsFormProps {
   disabled?: boolean;
   errors: ProductErrorFragment[];
 
-  onChange(event: any);
+  onChange: (event: any) => any;
 }
 
 export const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
@@ -38,7 +39,7 @@ export const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
       <DashboardCard.Title>
         {intl.formatMessage(commonMessages.generalInformations)}
       </DashboardCard.Title>
-      <DashboardCard.Content display="grid" gap={5} paddingX={8}>
+      <DashboardCard.Content display="grid" gap={2}>
         <Input
           label={intl.formatMessage({
             id: "6AMFki",

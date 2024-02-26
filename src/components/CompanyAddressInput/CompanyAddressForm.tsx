@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import FormSpacer from "@dashboard/components/FormSpacer";
 import Grid from "@dashboard/components/Grid";
 import SingleAutocompleteSelectField, {
@@ -87,6 +88,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
     <div className={classes.root} data-test-id="company-info">
       <TextField
         disabled={disabled}
+        data-test-id="company-name-input"
         error={!!formErrors.companyName}
         helperText={getErrorMessage(formErrors.companyName, intl)}
         label={intl.formatMessage({
@@ -106,6 +108,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
       <TextField
         disabled={disabled}
         error={!!formErrors.streetAddress1}
+        data-test-id="company-address-line-1-input"
         helperText={getErrorMessage(formErrors.streetAddress1, intl)}
         label={intl.formatMessage({
           id: "B52Em/",
@@ -124,6 +127,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
       <TextField
         disabled={disabled}
         error={!!formErrors.streetAddress2}
+        data-test-id="company-address-line-2-input"
         helperText={getErrorMessage(formErrors.streetAddress2, intl)}
         label={intl.formatMessage({
           id: "oQY0a2",
@@ -143,6 +147,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
         <TextField
           disabled={disabled}
           error={!!formErrors.city}
+          data-test-id="company-city-input"
           helperText={getErrorMessage(formErrors.city, intl)}
           label={intl.formatMessage({
             id: "TE4fIS",
@@ -160,6 +165,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
         <TextField
           disabled={disabled}
           error={!!formErrors.postalCode}
+          data-test-id="company-zip-input"
           helperText={getErrorMessage(formErrors.postalCode, intl)}
           label={intl.formatMessage({
             id: "oYGfnY",
@@ -223,6 +229,7 @@ const CompanyAddressForm: React.FC<CompanyAddressFormProps> = props => {
       <TextField
         disabled={disabled}
         error={!!formErrors.phone}
+        data-test-id="company-phone-input"
         fullWidth
         helperText={getErrorMessage(formErrors.phone, intl)}
         label={intl.formatMessage({

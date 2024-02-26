@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { MarkAsPaidStrategyEnum } from "@dashboard/graphql";
 import {
   order as orderFixture,
@@ -29,7 +30,7 @@ jest.mock("@saleor/macaw-ui", () => ({
   ResponsiveTable: jest.fn(() => <></>),
 }));
 
-jest.mock("@saleor/macaw-ui/next", () => ({
+jest.mock("@saleor/macaw-ui-next", () => ({
   useTheme: jest.fn(() => () => ({})),
   Divider: jest.fn(() => <></>),
   vars: {
@@ -49,6 +50,10 @@ jest.mock("@saleor/macaw-ui/next", () => ({
 
 jest.mock("react-router-dom", () => ({
   Link: jest.fn(({ to, ...props }) => <a href={to} {...props} />),
+}));
+
+jest.mock("@dashboard/featureFlags", () => ({
+  useFlag: jest.fn(() => ({ enabled: false })),
 }));
 
 describe("OrderPaymentOrTransaction", () => {

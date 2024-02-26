@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import VerticalSpacer from "@dashboard/components/VerticalSpacer";
 import { CountryFragment } from "@dashboard/graphql";
 import { useLocalSearch } from "@dashboard/hooks/useLocalSearch";
@@ -14,7 +15,8 @@ import {
   Radio,
   TextField,
 } from "@material-ui/core";
-import { Button, DialogHeader, SearchIcon } from "@saleor/macaw-ui";
+import { DialogHeader, SearchIcon } from "@saleor/macaw-ui";
+import { Button } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -59,6 +61,7 @@ export const TaxCountryDialog: React.FC<TaxCountryDialogProps> = ({
       </DialogHeader>
       <DialogContent className={classes.wrapper}>
         <TextField
+          data-test-id="search-country-input"
           value={query}
           onChange={e => setQuery(e.target.value)}
           variant="outlined"
@@ -78,6 +81,7 @@ export const TaxCountryDialog: React.FC<TaxCountryDialogProps> = ({
           {filteredCountries.map(country => (
             <React.Fragment key={country.code}>
               <FormControlLabel
+                data-test-id="country-row"
                 label={country.country}
                 checked={country.code === selectedCountry?.code}
                 onChange={() => setSelectedCountry(country)}
@@ -90,6 +94,7 @@ export const TaxCountryDialog: React.FC<TaxCountryDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button
+          data-test-id="add-button"
           variant="primary"
           onClick={() => {
             onConfirm(selectedCountry);

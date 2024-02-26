@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import placeholderImage from "@assets/images/placeholder255x255.png";
 import { channelsList } from "@dashboard/channels/fixtures";
 import { collections } from "@dashboard/collections/fixtures";
@@ -7,7 +8,6 @@ import {
   ProductVariantBulkErrorCode,
 } from "@dashboard/graphql";
 import { taxClasses } from "@dashboard/taxes/fixtures";
-import { warehouseList } from "@dashboard/warehouses/fixtures";
 import React from "react";
 
 import { product as productFixture } from "../../fixtures";
@@ -61,7 +61,6 @@ const props: ProductUpdatePageProps = {
   taxClasses,
   fetchMoreTaxClasses: undefined,
   variants: product.variants,
-  warehouses: warehouseList,
   attributeValues: [],
 };
 
@@ -134,7 +133,6 @@ export const NoStockAndNoVariants = () => (
 export const NoStockNoVariantsAndNoWarehouses = () => (
   <ProductUpdatePage
     {...props}
-    warehouses={[]}
     product={{
       ...product,
       productType: {

@@ -1,9 +1,11 @@
+// @ts-strict-ignore
 import {
   createCollectionChannels,
   createCollectionChannelsData,
 } from "@dashboard/channels/utils";
 import ActionDialog from "@dashboard/components/ActionDialog";
 import useAppChannel from "@dashboard/components/AppLayout/AppChannelContext";
+import { Container } from "@dashboard/components/AssignContainerDialog";
 import AssignProductDialog from "@dashboard/components/AssignProductDialog";
 import { Button } from "@dashboard/components/Button";
 import ChannelsAvailabilityDialog from "@dashboard/components/ChannelsAvailabilityDialog";
@@ -80,10 +82,8 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
 
-  const [
-    updateChannels,
-    updateChannelsOpts,
-  ] = useCollectionChannelListingUpdateMutation({});
+  const [updateChannels, updateChannelsOpts] =
+    useCollectionChannelListingUpdateMutation({});
   const { availableChannels } = useAppChannel(false);
 
   const handleCollectionUpdate = (data: CollectionUpdateMutation) => {
@@ -127,24 +127,22 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({
     },
   );
 
-  const [
-    unassignProduct,
-    unassignProductOpts,
-  ] = useUnassignCollectionProductMutation({
-    onCompleted: data => {
-      if (data.collectionRemoveProducts.errors.length === 0) {
-        notify({
-          status: "success",
-          text: intl.formatMessage({
-            id: "WW+Ruy",
-            defaultMessage: "Deleted product from collection",
-          }),
-        });
-        reset();
-        closeModal();
-      }
-    },
-  });
+  const [unassignProduct, unassignProductOpts] =
+    useUnassignCollectionProductMutation({
+      onCompleted: data => {
+        if (data.collectionRemoveProducts.errors.length === 0) {
+          notify({
+            status: "success",
+            text: intl.formatMessage({
+              id: "WW+Ruy",
+              defaultMessage: "Deleted product from collection",
+            }),
+          });
+          reset();
+          closeModal();
+        }
+      },
+    });
 
   const [removeCollection, removeCollectionOpts] = useRemoveCollectionMutation({
     onCompleted: data => {
@@ -161,9 +159,8 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({
     },
   });
 
-  const [paginationState, setPaginationState] = useLocalPaginationState(
-    PAGINATE_BY,
-  );
+  const [paginationState, setPaginationState] =
+    useLocalPaginationState(PAGINATE_BY);
   const paginate = useLocalPaginator(setPaginationState);
 
   const [selectedChannel] = useLocalStorage("collectionListChannel", "");
@@ -174,10 +171,8 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   });
 
   const collection = data?.collection;
-  const allChannels = createCollectionChannels(
-    availableChannels,
-  )?.sort((channel, nextChannel) =>
-    channel.name.localeCompare(nextChannel.name),
+  const allChannels = createCollectionChannels(availableChannels)?.sort(
+    (channel, nextChannel) => channel.name.localeCompare(nextChannel.name),
   );
   const collectionChannelsChoices = createCollectionChannelsData(collection);
   const {
@@ -248,16 +243,18 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({
     variables => updatePrivateMetadata({ variables }),
   );
 
-  const handleAssignationChange = async products => {
+  const handleAssignationChange = async (products: Container[]) => {
+    const productIds = products.map(product => product.id);
+
     const toUnassignIds = Object.keys(assignedProductDict).filter(
-      s => assignedProductDict[s] && !products.includes(s),
+      s => assignedProductDict[s] && !productIds.includes(s),
     );
 
     const baseVariables = { ...paginationState, collectionId: id };
 
-    if (products.length > 0) {
+    if (productIds.length > 0) {
       await assignProduct({
-        variables: { ...baseVariables, productIds: products },
+        variables: { ...baseVariables, productIds },
       });
     }
 

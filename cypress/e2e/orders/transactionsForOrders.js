@@ -4,23 +4,21 @@
 import faker from "faker";
 
 import { ORDERS_SELECTORS } from "../../elements/orders/orders-selectors";
-import { ONE_PERMISSION_USERS, urlList } from "../../fixtures";
+import {
+  ONE_PERMISSION_USERS,
+  urlList,
+} from "../../fixtures";
 import {
   createChannel,
   createCustomer,
-  deleteCustomersStartsWith,
   getOrder,
   updateChannelOrderSettings,
 } from "../../support/api/requests";
 import {
   createOrder,
-  createReadyToFulfillOrder,
   createShipping,
-  deleteChannelsStartsWith,
-  deleteShippingStartsWith,
   getDefaultTaxClass,
   productsUtils,
-  updateTaxConfigurationForChannel,
 } from "../../support/api/utils";
 import { transactionsOrderUtils } from "../../support/pages/";
 
@@ -39,12 +37,7 @@ describe("Orders", () => {
   let taxClass;
 
   before(() => {
-    cy.clearSessionData().loginUserViaRequest();
-    deleteChannelsStartsWith(startsWith);
-    deleteCustomersStartsWith(startsWith);
-    deleteShippingStartsWith(startsWith);
-    productsUtils.deleteProductsStartsWith(startsWith);
-
+    cy.loginUserViaRequest();
     createChannel({ name: randomName })
       .then(channelResp => {
         channel = channelResp;
@@ -53,7 +46,6 @@ describe("Orders", () => {
           channelId: channel.id,
           markAsPaidStrategy: "TRANSACTION_FLOW",
         });
-        updateTaxConfigurationForChannel({ channelSlug: channel.slug });
         getDefaultTaxClass();
       })
       .then(resp => {
@@ -114,12 +106,10 @@ describe("Orders", () => {
   });
 
   beforeEach(() => {
-    cy.clearSessionData()
-      .loginUserViaRequest("auth", ONE_PERMISSION_USERS.order)
-      .then(() => {
-        // set notifiedAboutNavigator to make navigator banner gone from the start - banner was covering needed elements during test
-        window.localStorage.setItem("notifiedAboutNavigator", "true");
-      });
+    cy.loginUserViaRequest("auth", ONE_PERMISSION_USERS.order).then(() => {
+      // set notifiedAboutNavigator to make navigator banner gone from the start - banner was covering needed elements during test
+      window.localStorage.setItem("notifiedAboutNavigator", "true");
+    });
   });
 
   it(
@@ -144,7 +134,8 @@ describe("Orders", () => {
     },
   );
 
-  it(
+  // TODO uncomment when bug: https://github.com/saleor/saleor/issues/12757 if fixed
+  xit(
     "should be able to grant and send refund TC: 3902",
     { tags: ["@orders", "@allEnv", "@stable"] },
     () => {

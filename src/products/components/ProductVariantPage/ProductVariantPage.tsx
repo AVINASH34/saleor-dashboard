@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   getReferenceAttributeEntityTypeFromAttribute,
   mergeAttributeValues,
@@ -5,12 +6,14 @@ import {
 import { ChannelPriceData } from "@dashboard/channels/utils";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import AssignAttributeValueDialog from "@dashboard/components/AssignAttributeValueDialog";
+import { Container } from "@dashboard/components/AssignContainerDialog";
 import {
   AttributeInput,
   Attributes,
   VariantAttributeScope,
 } from "@dashboard/components/Attributes";
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Grid from "@dashboard/components/Grid";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { MetadataFormData } from "@dashboard/components/Metadata";
@@ -30,7 +33,6 @@ import { VariantDetailsChannelsAvailabilityCard } from "@dashboard/products/comp
 import { productUrl } from "@dashboard/products/urls";
 import { getSelectedMedia } from "@dashboard/products/utils/data";
 import { FetchMoreProps, RelayToFlat, ReorderAction } from "@dashboard/types";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React from "react";
 import { defineMessages, useIntl } from "react-intl";
 
@@ -117,10 +119,10 @@ interface ProductVariantPageProps {
   variantDeactivatePreoderButtonState: ConfirmButtonTransitionState;
   onVariantReorder: ReorderAction;
   onAttributeSelectBlur: () => void;
-  onDelete();
-  onSubmit(data: ProductVariantUpdateSubmitData);
-  onSetDefaultVariant();
-  onWarehouseConfigure();
+  onDelete: () => any;
+  onSubmit: (data: ProductVariantUpdateSubmitData) => any;
+  onSetDefaultVariant: () => any;
+  onWarehouseConfigure: () => any;
 }
 
 const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
@@ -179,7 +181,7 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
   };
 
   const handleAssignReferenceAttribute = (
-    attributeValues: string[],
+    attributeValues: Container[],
     data: ProductVariantUpdateData,
     handlers: ProductVariantUpdateHandlers,
   ) => {
@@ -187,9 +189,13 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
       assignReferencesAttributeId,
       mergeAttributeValues(
         assignReferencesAttributeId,
-        attributeValues,
+        attributeValues.map(({ id }) => id),
         data.attributes,
       ),
+    );
+    handlers.selectAttributeReferenceMetadata(
+      assignReferencesAttributeId,
+      attributeValues.map(({ name, id }) => ({ value: id, label: name })),
     );
     onCloseDialog();
   };
@@ -219,7 +225,6 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
           {({
             change,
             data,
-            formErrors,
             validationErrors,
             isSaveDisabled,
             handlers,
@@ -259,6 +264,8 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
                     <CardSpacer />
                     <VariantDetailsChannelsAvailabilityCard
                       variant={variant}
+                      listings={data.channelListings}
+                      disabled={loading}
                       onManageClick={toggleManageChannels}
                     />
                     {nonSelectionAttributes.length > 0 && (
@@ -312,7 +319,7 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
                       </>
                     )}
                     <ProductVariantMedia
-                      disabled={loading}
+                      disabled={loading || productMedia.length === 0}
                       media={media}
                       placeholderImage={placeholderImage}
                       onImageAdd={toggleModal}
@@ -320,7 +327,7 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
                     <CardSpacer />
                     <ProductVariantPrice
                       disabled={!variant}
-                      ProductVariantChannelListings={data.channelListings.map(
+                      productVariantChannelListings={data.channelListings.map(
                         channel => ({
                           ...channel.data,
                           ...channel.value,
@@ -354,22 +361,14 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
                           ...channel.value,
                         }),
                       )}
-                      onVariantChannelListingChange={handlers.changeChannels}
                       data={data}
                       disabled={loading}
                       hasVariants={true}
                       errors={errors}
-                      formErrors={formErrors}
                       stocks={data.stocks}
                       warehouses={warehouses}
                       onChange={handlers.changeStock}
                       onFormDataChange={change}
-                      onChangePreorderEndDate={handlers.changePreorderEndDate}
-                      onEndPreorderTrigger={
-                        !!variant?.preorder
-                          ? () => setIsEndPreorderModalOpened(true)
-                          : null
-                      }
                       onWarehouseStockAdd={handlers.addStock}
                       onWarehouseStockDelete={handlers.deleteStock}
                       onWarehouseConfigure={onWarehouseConfigure}
@@ -394,6 +393,9 @@ const ProductVariantPage: React.FC<ProductVariantPageProps> = ({
                     confirmButtonState={"default"}
                     products={referenceProducts}
                     pages={referencePages}
+                    attribute={data.attributes.find(
+                      ({ id }) => id === assignReferencesAttributeId,
+                    )}
                     hasMore={handlers.fetchMoreReferences?.hasMore}
                     open={canOpenAssignReferencesAttributeDialog}
                     onFetch={handlers.fetchReferences}

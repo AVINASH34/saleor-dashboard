@@ -1,58 +1,60 @@
-I want to merge this change because...
+<!--
+  First of all, thank your for the contribution! We appreciate all incoming pull requests! 🥳
 
-<!-- Please mention all relevant issue numbers. -->
+  Before submitting your pull request, please ensure you've done the following:
 
-**PR intended to be tested with API branch:** <!-- For example: feature/warehouses  -->
+    📖 Read contribution guide: https://github.com/saleor/saleor-dashboard/blob/main/.github/CONTRIBUTING.md
+    🤓 Your pull request is small enough (otherwise please create smaller chunks)
+    👀 You have added proper test coverage
+    👜 The pull request's title is readable and meaningful
+    📜 You have added changeset file
+    📄 If you add/update some copy, they are extracted: run npm run extract-messages
+  
+  🧵 NOTE: Tests.
+    Tests are MANDATORY, please follow these scenarios:
+    👉🏼 when you are fixing a bug, test should cover regression you fix
+    👉🏼 when you develop new feature, test should cover at least user stories steps (it can be tested by rendering component that implements given feature)
+    👉🏼 Please do not implement e2e tests by yourself, we try to limit them for the favor of integration (RTL) ones or units.
+    
 
-### Screenshots
+  🧵 NOTE: Changesets.
+    Each pull request requires changeset file, that you can add by running command: npm run change:add. The prompt will ask you to pick a type of change:
+    👉🏼 patch - any fix, typo change, CI change, tiny visuals, basically any change that can be seamlessly portable to previous releases
+    👉🏼 minor - new features, ui changes, everything that will be includes in the upcoming minor release.
+-->
 
-<!-- If your changes affect the UI, providing "before" and "after" screenshots will
-greatly reduce the amount of work needed to review your work. -->
+## What type of PR is this?
+- [ ] 💅 Refactor
+- [ ] 🌟 Feature
+- [ ] 🔥 Bug Fix
+- [ ] 🔩 Maintenance
+- [ ] 🛠 Workflow CI/CD changes
 
-### Pull Request Checklist
+## Related Issues or Documents
+<!--
+  🔑 In this section please attach any resources that are related
+  such as: other issues, other pull requests, docs link etc.
+  
+  If your pull request is closing some issue, use the close clause:
+    closes #123 - github will automatically link related by by its number
+-->
 
-<!-- Please keep this section. It will make maintainer's life easier. -->
+- closes #
 
-1. [ ] This code contains UI changes
-2. [ ] All visible strings are translated with proper context including data-formatting
-3. [ ] Attributes `[data-test-id]` are added for new elements
-4. [ ] Changes are mentioned in the changelog
-5. [ ] The changes are tested in different browsers and in light/dark mode
+## Usage Instructions, Screenshots, Recordings
+<!--
+  🔑 Attach here anything that is needed for maintainers:
+  - if it's a bug, attach steps to reproduce (unless they are already attached with linked issue)
+  - any instructions of usage
+  - screenshots or videos if applicable
+-->
 
-### Test environment config
+## Have you written tests?
+- [ ] Yes!
+- [ ] No... here is why: _Writing tests are mandatory, please replace this text with why test are not included in this PR_
 
-<!-- Do not remove this section. It is required to properly setup test deployment instance.
-Modify API_URI if you want test instance to use custom backend. CYPRESS_API_URI is optional, use when necessary. -->
 
-API_URI=https://automation-dashboard.staging.saleor.cloud/graphql/
-APPS_MARKETPLACE_API_URI=https://apps.staging.saleor.io/api/v2/saleor-apps
-
-### Do you want to run more stable tests?
-
-To run all tests, just select the stable checkbox. To speed up tests, increase the number of containers. Tests will be re-run only when the "run e2e" label is added.
-
-1. [ ] stable
-2. [ ] giftCard
-3. [ ] category
-4. [ ] collection
-5. [ ] attribute
-6. [ ] productType
-7. [ ] shipping
-8. [ ] customer
-9. [ ] permissions
-10. [ ] menuNavigation
-11. [ ] pages
-12. [ ] sales
-13. [ ] vouchers
-14. [ ] homePage
-15. [ ] login
-16. [ ] orders
-17. [ ] products
-18. [ ] app
-19. [ ] plugins
-20. [ ] translations
-21. [ ] navigation
-22. [ ] variants
-23. [ ] payments
-
-CONTAINERS=1
+## [Optional] Description
+<!--
+  🔑 Put here any additional information regarding change you make. Any additional context, description of what was done.
+-->

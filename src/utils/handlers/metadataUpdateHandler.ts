@@ -22,7 +22,7 @@ export interface ObjectWithMetadata {
 
 function createMetadataUpdateHandler<TData extends MetadataFormData, TError>(
   initial: ObjectWithMetadata,
-  update: (data: TData) => SubmitPromise<TError[]>,
+  update: (data: TData) => SubmitPromise<TError[] | undefined>,
   updateMetadata: (
     variables: UpdateMetadataMutationVariables,
   ) => Promise<FetchResult<UpdateMetadataMutation>>,
@@ -44,19 +44,18 @@ function createMetadataUpdateHandler<TData extends MetadataFormData, TError>(
       data.privateMetadata,
     );
 
-    if (errors.length > 0) {
+    if (errors && errors.length > 0) {
       return errors;
     }
 
-    if (errors.length === 0) {
+    if (errors?.length === 0) {
       if (data.metadata && hasMetadataChanged) {
         const initialKeys = initial.metadata.map(m => m.key);
         const modifiedKeys = data.metadata.map(m => m.key);
-
         const keyDiff = arrayDiff(initialKeys, modifiedKeys);
         const metadataInput = filterMetadataArray(data.metadata);
 
-        if (metadataInput.length) {
+        if (metadataInput.length || keyDiff.removed.length) {
           const updateMetaResult = await updateMetadata({
             id: initial.id,
             input: metadataInput,
@@ -81,7 +80,7 @@ function createMetadataUpdateHandler<TData extends MetadataFormData, TError>(
         const keyDiff = arrayDiff(initialKeys, modifiedKeys);
         const privateMetadataInput = filterMetadataArray(data.privateMetadata);
 
-        if (privateMetadataInput.length) {
+        if (privateMetadataInput.length || keyDiff.removed.length) {
           const updatePrivateMetaResult = await updatePrivateMetadata({
             id: initial.id,
             input: privateMetadataInput,

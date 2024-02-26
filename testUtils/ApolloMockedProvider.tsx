@@ -17,7 +17,11 @@ const mocks: MockedResponse[] = [
   ...introspectionMocks,
 ];
 
-export const ApolloMockedProvider = ({ children }) => (
+interface ApolloMockedProviderProps {
+  children: React.ReactNode
+}
+
+export const ApolloMockedProvider = ({ children }: ApolloMockedProviderProps) => (
   <MockedProvider mocks={mocks} addTypename={false}>
     {children}
   </MockedProvider>

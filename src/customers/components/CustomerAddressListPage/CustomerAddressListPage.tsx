@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { Button } from "@dashboard/components/Button";
 import { ListPageLayout } from "@dashboard/components/Layouts";
@@ -6,7 +7,7 @@ import { AddressTypeEnum, CustomerAddressesFragment } from "@dashboard/graphql";
 import { getStringOrPlaceholder, renderCollection } from "@dashboard/misc";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { Box } from "@saleor/macaw-ui/next";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 import { defineMessages, useIntl } from "react-intl";
 
@@ -116,7 +117,7 @@ const CustomerAddressListPage: React.FC<
           display="flex"
           justifyContent="center"
           alignItems="center"
-          padding={9}
+          padding={6}
           flexDirection="column"
         >
           <Typography variant="h5">

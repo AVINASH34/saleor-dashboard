@@ -1,5 +1,9 @@
+// @ts-strict-ignore
 import BackButton from "@dashboard/components/BackButton";
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import {
@@ -18,8 +22,8 @@ import {
   DialogTitle,
   TextField,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState, makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { makeStyles } from "@saleor/macaw-ui";
+import { vars } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -42,7 +46,7 @@ const initialForm: AddMemberFormData = {
 const useStyles = makeStyles(
   theme => ({
     hr: {
-      backgroundColor: vars.colors.border.neutralPlain,
+      backgroundColor: vars.colors.border.default1,
       border: "none",
       height: 1,
       marginBottom: 0,
@@ -106,12 +110,14 @@ const StaffAddMemberDialog: React.FC<StaffAddMemberDialogProps> = props => {
             <DialogContent>
               <div className={classes.textFieldGrid}>
                 <TextField
+                  data-test-id="first-name-input"
                   {...getFieldProps("firstName")}
                   type="text"
                   value={formData.firstName}
                   onChange={change}
                 />
                 <TextField
+                  data-test-id="last-name-input"
                   {...getFieldProps("lastName")}
                   type="text"
                   value={formData.lastName}
@@ -120,6 +126,7 @@ const StaffAddMemberDialog: React.FC<StaffAddMemberDialogProps> = props => {
               </div>
               <FormSpacer />
               <TextField
+                data-test-id="email-input"
                 fullWidth
                 {...getFieldProps("email")}
                 type="email"

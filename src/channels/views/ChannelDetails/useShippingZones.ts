@@ -10,14 +10,12 @@ import useShippingZonesSearch from "@dashboard/searches/useShippingZonesSearch";
 
 export const useShippingZones = (channelId?: string) => {
   const userPermissions = useUserPermissions();
-  const canLoadShippingZones = hasPermissions(userPermissions, [
+  const canLoadShippingZones = hasPermissions(userPermissions!, [
     PermissionEnum.MANAGE_SHIPPING,
   ]);
 
-  const {
-    data: shippingZonesCountData,
-    loading: shippingZonesCountLoading,
-  } = useShippingZonesCountQuery({ skip: !canLoadShippingZones });
+  const { data: shippingZonesCountData, loading: shippingZonesCountLoading } =
+    useShippingZonesCountQuery({ skip: !canLoadShippingZones });
 
   const {
     data: channelShippingZonesData,
@@ -25,7 +23,7 @@ export const useShippingZones = (channelId?: string) => {
   } = useChannelShippingZonesQuery({
     variables: {
       filter: {
-        channels: [channelId],
+        channels: [channelId!],
       },
     },
     skip: !channelId || !canLoadShippingZones,

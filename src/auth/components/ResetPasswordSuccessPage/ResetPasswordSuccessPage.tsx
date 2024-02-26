@@ -13,7 +13,9 @@ export interface ResetPasswordSuccessPageProps {
   onBack: () => void;
 }
 
-const ResetPasswordSuccessPage: React.FC<ResetPasswordSuccessPageProps> = props => {
+const ResetPasswordSuccessPage: React.FC<
+  ResetPasswordSuccessPageProps
+> = props => {
   const { onBack } = props;
 
   const classes = useStyles(props);
@@ -35,6 +37,7 @@ const ResetPasswordSuccessPage: React.FC<ResetPasswordSuccessPageProps> = props 
         variant="primary"
         onClick={onBack}
         type="submit"
+        data-test-id="back-to-login-button"
       >
         <FormattedMessage
           id="2oyWT9"

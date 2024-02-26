@@ -1,4 +1,4 @@
-import { Box } from "@saleor/macaw-ui/next";
+import { Box } from "@saleor/macaw-ui-next";
 import React from "react";
 
 interface AppLogoProps {
@@ -10,8 +10,8 @@ export const AppLogo: React.FC<AppLogoProps> = ({
   children,
 }) => (
   <Box
-    width={13}
-    height={13}
+    width={10}
+    height={10}
     display="flex"
     placeItems="center"
     borderRadius={3}

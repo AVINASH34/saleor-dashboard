@@ -27,7 +27,7 @@ export function createShippingZoneAddHandler(
         zoneId,
       ),
       shippingZonesToDisplay: [
-        ...data.shippingZonesToDisplay,
+        ...data.shippingZonesToDisplay!,
         getParsedSearchData({ data: searchShippingZonesData }).find(
           getById(zoneId),
         ),
@@ -54,7 +54,7 @@ export function createShippingZoneRemoveHandler(
         data.shippingZonesIdsToRemove,
         zoneId,
       ),
-      shippingZonesToDisplay: data.shippingZonesToDisplay.filter(
+      shippingZonesToDisplay: data.shippingZonesToDisplay!.filter(
         getByUnmatchingId(zoneId),
       ),
     });

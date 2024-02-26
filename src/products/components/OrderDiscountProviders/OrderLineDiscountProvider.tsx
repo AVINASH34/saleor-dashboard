@@ -1,3 +1,5 @@
+// @ts-strict-ignore
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import {
   MoneyFragment,
   OrderDetailsFragment,
@@ -8,8 +10,7 @@ import useNotifier from "@dashboard/hooks/useNotifier";
 import { getDefaultNotifierSuccessErrorData } from "@dashboard/hooks/useNotifier/utils";
 import { getById } from "@dashboard/misc";
 import { OrderDiscountCommonInput } from "@dashboard/orders/components/OrderDiscountCommonModal/types";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
-import React, { createContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useIntl } from "react-intl";
 
 import {
@@ -44,12 +45,23 @@ interface DiscountProviderProps {
 export const OrderLineDiscountContext =
   createContext<GetOrderLineDiscountContextConsumerProps>(null);
 
+export const useOrderLineDiscountContext = () => {
+  const context = useContext(OrderLineDiscountContext);
+
+  if (context === null) {
+    throw new Error("You are outside order line discount context");
+  }
+
+  return context;
+};
+
 export const OrderLineDiscountProvider: React.FC<DiscountProviderProps> = ({
   children,
   order,
 }) => {
   const intl = useIntl();
   const notify = useNotifier();
+
   const { isDialogOpen, openDialog, closeDialog } = useDiscountDialog();
   const [currentLineId, setCurrentLineId] = useState<string | null>(null);
 
@@ -83,7 +95,10 @@ export const OrderLineDiscountProvider: React.FC<DiscountProviderProps> = ({
   const addOrUpdateOrderLineDiscount =
     (orderLineId: string) => (input: OrderDiscountCommonInput) =>
       orderLineDiscountAddOrUpdate({
-        variables: { orderLineId, input: getParsedDiscountData(input) },
+        variables: {
+          orderLineId,
+          input: getParsedDiscountData(input),
+        },
       });
 
   const removeOrderLineDiscount = (orderLineId: string) => () =>

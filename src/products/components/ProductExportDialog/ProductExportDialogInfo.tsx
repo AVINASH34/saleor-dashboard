@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import Accordion, { AccordionProps } from "@dashboard/components/Accordion";
 import { useChannelsSearch } from "@dashboard/components/ChannelsAvailabilityDialog/utils";
 import ChannelsAvailabilityDialogChannelsList from "@dashboard/components/ChannelsAvailabilityDialogChannelsList";
@@ -141,12 +142,14 @@ const Option: React.FC<{
   );
 };
 
-const FieldAccordion: React.FC<AccordionProps & {
-  data: ExportProductsInput;
-  fields: ProductFieldEnum[];
-  onChange: (event: ChangeEvent) => void;
-  onToggleAll: (field: ProductFieldEnum[], setTo: boolean) => void;
-}> = ({ data, fields, onChange, onToggleAll, ...props }) => {
+const FieldAccordion: React.FC<
+  AccordionProps & {
+    data: ExportProductsInput;
+    fields: ProductFieldEnum[];
+    onChange: (event: ChangeEvent) => void;
+    onToggleAll: (field: ProductFieldEnum[], setTo: boolean) => void;
+  }
+> = ({ data, fields, onChange, onToggleAll, ...props }) => {
   const classes = useStyles({});
   const getFieldLabel = useProductExportFieldMessages();
 
@@ -317,6 +320,7 @@ const ProductExportDialogInfo: React.FC<ProductExportDialogInfoProps> = ({
       </Typography>
       <div className={classes.scrollArea}>
         <Accordion
+          dataTestId="channel-expand-button"
           className={classes.accordion}
           title={intl.formatMessage(sectionNames.channels)}
           quickPeek={
@@ -489,6 +493,7 @@ const ProductExportDialogInfo: React.FC<ProductExportDialogInfoProps> = ({
               <div className={classes.quickPeekContainer}>
                 {selectedInventoryFields.slice(0, maxChips).map(field => (
                   <Chip
+                    key={field}
                     className={classes.chip}
                     label={getFieldLabel(field)}
                     onClose={() =>
@@ -505,6 +510,7 @@ const ProductExportDialogInfo: React.FC<ProductExportDialogInfoProps> = ({
                   .slice(0, maxChips - selectedInventoryFields.length)
                   .map(warehouseId => (
                     <Chip
+                      key={warehouseId}
                       className={classes.chip}
                       label={
                         warehouses.find(

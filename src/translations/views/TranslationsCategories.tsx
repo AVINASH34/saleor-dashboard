@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   LanguageCodeEnum,
   useCategoryTranslationDetailsQuery,
@@ -16,6 +17,8 @@ import { useIntl } from "react-intl";
 import TranslationsCategoriesPage from "../components/TranslationsCategoriesPage";
 import { TranslationField, TranslationInputFieldName } from "../types";
 import { getParsedTranslationInputData } from "../utils";
+
+type HandleSubmitData = string | OutputData;
 
 export interface TranslationsCategoriesQueryParams {
   activeField: string;
@@ -40,21 +43,19 @@ const TranslationsCategories: React.FC<TranslationsCategoriesProps> = ({
     variables: { id, language: languageCode },
   });
 
-  const [
-    updateTranslations,
-    updateTranslationsOpts,
-  ] = useUpdateCategoryTranslationsMutation({
-    onCompleted: data => {
-      if (data.categoryTranslate.errors.length === 0) {
-        categoryTranslations.refetch();
-        notify({
-          status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
-        });
-        navigate("?", { replace: true });
-      }
-    },
-  });
+  const [updateTranslations, updateTranslationsOpts] =
+    useUpdateCategoryTranslationsMutation({
+      onCompleted: data => {
+        if (data.categoryTranslate.errors.length === 0) {
+          categoryTranslations.refetch();
+          notify({
+            status: "success",
+            text: intl.formatMessage(commonMessages.savedChanges),
+          });
+          navigate("?", { replace: true });
+        }
+      },
+    });
 
   const onEdit = (field: string) =>
     navigate(
@@ -71,7 +72,7 @@ const TranslationsCategories: React.FC<TranslationsCategoriesProps> = ({
 
   const handleSubmit = (
     { name: fieldName }: TranslationField<TranslationInputFieldName>,
-    data: string | OutputData,
+    data: HandleSubmitData,
   ) =>
     extractMutationErrors(
       updateTranslations({

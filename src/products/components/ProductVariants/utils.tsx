@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { ChannelData } from "@dashboard/channels/utils";
 import {
   booleanCell,
@@ -63,7 +64,7 @@ export function getError(
     return false;
   }
 
-  const columnId = availableColumns[column].id;
+  const columnId = availableColumns[column]?.id;
   const variantId = variants[row + removed.filter(r => r <= row).length]?.id;
 
   if (!variantId) {
@@ -112,18 +113,18 @@ export function getData({
   if (column === -1) {
     return textCell("");
   }
-
-  const columnId = availableColumns[column].id;
+  const columnId = availableColumns[column]?.id;
   const change = changes.current[getChangeIndex(columnId, row)]?.data;
   const dataRow = added.includes(row)
     ? undefined
-    : variants[row + removed.filter(r => r <= row).length];
+    : variants.filter((_, index) => !removed.includes(index))[row];
 
   switch (columnId) {
     case "name":
-    case "sku":
+    case "sku": {
       const value = change ?? (dataRow ? dataRow[columnId] : "");
       return textCell(value || "");
+    }
   }
 
   if (getColumnStock(columnId)) {
@@ -148,7 +149,7 @@ export function getData({
 
     if (!available) {
       return {
-        ...numberCell(numberCellEmptyValue),
+        ...numberCell(numberCellEmptyValue, { hasFloatingPoint: true }),
         readonly: false,
         allowOverlay: false,
       };

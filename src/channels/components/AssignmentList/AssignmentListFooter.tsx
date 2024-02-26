@@ -44,7 +44,7 @@ const AssignmentListFooter: React.FC<AssignmentListFooterProps> = ({
     itemsRef.current = items;
   }, [items]);
 
-  const handleChoice = ({ target }) => {
+  const handleChoice = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setIsChoicesSelectShown(false);
     addItem(target.value);
   };

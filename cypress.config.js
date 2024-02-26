@@ -2,35 +2,37 @@
 /* eslint-disable no-console */
 const { defineConfig } = require("cypress");
 const fs = require("fs");
+const cypressSplit = require("cypress-split");
 
 module.exports = defineConfig({
-  reporter: "junit",
-  reporterOptions: {
-    mochaFile: "results/my-test-output-[hash].xml",
-  },
   projectId: "51ef7c",
   chromeWebSecurity: false,
   defaultCommandTimeout: 20000,
   requestTimeout: 20000,
   viewportWidth: 1400,
   viewportHeight: 660,
+  screenshotsFolder: "cypress/reports/mochareports",
+  screenshotOnRunFailure: true,
+  experimentalMemoryManagement: true,
+  numTestsKeptInMemory: 8,
   retries: {
-    runMode: 1,
+    runMode: 2,
     openMode: 0,
+  },
+  reporter: "cypress-multi-reporters",
+  reporterOptions: {
+    configFile: "reporter-config.json",
   },
   e2e: {
     env: {
       grepFilterSpecs: true,
-      demoTests: false,
+      grepOmitFiltered: true,
     },
-    setupNodeEvents(on, config) {
-      config.specPattern = process.env.CYPRESS_demoTests
-        ? "cypress/e2e/percy/**/*.{js,jsx,ts,tsx}"
-        : "cypress/e2e/**/*.{js,jsx,ts,tsx}";
-
+    baseUrl: process.env.BASE_URL,
+    async setupNodeEvents(on, config) {
       config = require("./cypress/support/cypress-grep/plugin")(config);
-      config = require("./cypress/plugins/index.js")(on, config);
-
+      config = await require("./cypress/plugins/index.js")(on, config);
+      cypressSplit(on, config);
       on("after:spec", (spec, results) => {
         if (results && results.video) {
           return fs.unlink(results.video, function (err) {
@@ -44,5 +46,6 @@ module.exports = defineConfig({
       });
       return config;
     },
+    specPattern: "cypress/e2e/**/*.{js,jsx,ts,tsx}",
   },
 });

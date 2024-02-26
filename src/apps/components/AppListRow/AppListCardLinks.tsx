@@ -1,6 +1,6 @@
 import { AppLink } from "@dashboard/apps/types";
 import Link from "@dashboard/components/Link";
-import { Box, Text } from "@saleor/macaw-ui/next";
+import { Box, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 
 interface AppListCardLinksProps {
@@ -18,17 +18,17 @@ const AppListCardLinks: React.FC<AppListCardLinksProps> = ({ links }) => {
       display="flex"
       flexDirection="row"
       flexWrap="wrap"
-      gap={7}
+      gap={4}
       borderLeftStyle="solid"
       borderRightStyle="solid"
       borderWidth={1}
-      borderColor="neutralPlain"
-      paddingY={6}
-      paddingX={8}
+      borderColor="default1"
+      paddingY={3}
+      paddingX={5}
     >
       {links?.map(link => (
         <Box as="span" key={link.name}>
-          <Text variant="body" size="small" color="textBrandDefault">
+          <Text variant="body" size="small" color="accent1">
             <Link href={link.url} target="_blank">
               {link.name}
             </Link>

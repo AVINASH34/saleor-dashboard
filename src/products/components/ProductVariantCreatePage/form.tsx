@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   getAttributesDisplayData,
   getRichTextAttributesFromMap,
@@ -9,6 +10,7 @@ import {
   createAttributeFileChangeHandler,
   createAttributeMultiChangeHandler,
   createAttributeReferenceChangeHandler,
+  createAttributeReferenceMetadataHandler,
   createAttributeValueReorderHandler,
   createFetchMoreReferencesHandler,
   createFetchReferencesHandler,
@@ -36,10 +38,14 @@ import useForm, {
 import useFormset, {
   FormsetChange,
   FormsetData,
+  FormsetMetadataChange,
 } from "@dashboard/hooks/useFormset";
 import useHandleFormSubmit from "@dashboard/hooks/useHandleFormSubmit";
 import { errorMessages } from "@dashboard/intl";
-import { getVariantAttributeInputFromProduct } from "@dashboard/products/utils/data";
+import {
+  AttributeValuesMetadata,
+  getVariantAttributeInputFromProduct,
+} from "@dashboard/products/utils/data";
 import {
   createPreorderEndDateChangeHandler,
   getChannelsInput,
@@ -108,6 +114,9 @@ export interface ProductVariantCreateHandlers
   changePreorderEndDate: FormChange;
   fetchReferences: (value: string) => void;
   fetchMoreReferences: FetchMoreProps;
+  selectAttributeReferenceMetadata: FormsetMetadataChange<
+    AttributeValuesMetadata[]
+  >;
 }
 
 export interface UseProductVariantCreateFormOutput
@@ -166,9 +175,8 @@ function useProductVariantCreateForm(
     setIsSubmitDisabled,
   } = form;
 
-  const currentChannelsWithPreorderInfo = createChannelsWithPreorderInfo(
-    product,
-  );
+  const currentChannelsWithPreorderInfo =
+    createChannelsWithPreorderInfo(product);
   const channelsInput = getChannelsInput(currentChannelsWithPreorderInfo);
 
   const attributes = useFormset(attributeInput);
@@ -188,9 +196,8 @@ function useProductVariantCreateForm(
     formId,
   });
 
-  const {
-    makeChangeHandler: makeMetadataChangeHandler,
-  } = useMetadataChangeTrigger();
+  const { makeChangeHandler: makeMetadataChangeHandler } =
+    useMetadataChangeTrigger();
 
   const changeMetadata = makeMetadataChangeHandler(handleChange);
 
@@ -207,6 +214,10 @@ function useProductVariantCreateForm(
   );
   const handleAttributeReferenceChange = createAttributeReferenceChangeHandler(
     attributes.change,
+    triggerChange,
+  );
+  const handleAttributeMetadataChange = createAttributeReferenceMetadataHandler(
+    attributes.setMetadata,
     triggerChange,
   );
   const handleFetchReferences = createFetchReferencesHandler(
@@ -328,7 +339,8 @@ function useProductVariantCreateForm(
     !!form.errors.preorderEndDateTime;
 
   const formDisabled = invalidPreorder || invalidChannels;
-  const isSaveDisabled = disabled || formDisabled || !onSubmit;
+  const isSaveDisabled =
+    disabled || formDisabled || !data.variantName || !onSubmit;
 
   setIsSubmitDisabled(isSaveDisabled);
 
@@ -353,6 +365,7 @@ function useProductVariantCreateForm(
       selectAttributeFile: handleAttributeFileChange,
       selectAttributeMultiple: handleAttributeMultiChange,
       selectAttributeReference: handleAttributeReferenceChange,
+      selectAttributeReferenceMetadata: handleAttributeMetadataChange,
     },
     submit,
     isSaveDisabled,

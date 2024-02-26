@@ -2,8 +2,8 @@ import { PermissionEnum } from "@dashboard/graphql";
 import React from "react";
 import { Route, RouteProps } from "react-router-dom";
 
-import { useUser } from "..";
 import NotFound from "../../NotFound";
+import { useUser } from "..";
 import { hasAllPermissions, hasAnyPermissions } from "../misc";
 
 type MatchPermissionType = "all" | "any";
@@ -33,10 +33,10 @@ export const SectionRoute: React.FC<SectionRouteProps> = ({
     }
 
     if (matchAll(matchPermission)) {
-      return hasAllPermissions(permissions, user);
+      return hasAllPermissions(permissions, user!);
     }
 
-    return hasAnyPermissions(permissions, user);
+    return hasAnyPermissions(permissions, user!);
   };
 
   return hasSectionPermissions() ? <Route {...props} /> : <NotFound />;

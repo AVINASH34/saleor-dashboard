@@ -12,11 +12,11 @@ type GiftCardCreateRequiresActivationSectionProps = Pick<
   "checked" | "onChange"
 >;
 
-const GiftCardCreateRequiresActivationSection: React.FC<GiftCardCreateRequiresActivationSectionProps> = ({
-  checked,
-  onChange,
-}) => (
+const GiftCardCreateRequiresActivationSection: React.FC<
+  GiftCardCreateRequiresActivationSectionProps
+> = ({ checked, onChange }) => (
   <ControlledCheckbox
+    data-test-id="requires-activation-section"
     name="requiresActivation"
     label={
       <>

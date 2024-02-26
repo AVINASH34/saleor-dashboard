@@ -24,7 +24,7 @@ export function getArrayQueryParam(
   return [param];
 }
 
-export const isExternalURL = url => /^https?:\/\//.test(url);
+export const isExternalURL = (url: string) => /^https?:\/\//.test(url);
 
 export const getAppMountUriForRedirect = () =>
   getAppMountUri() === getAppDefaultUri() ? "" : getAppMountUri();

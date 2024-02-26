@@ -20,11 +20,11 @@ export interface Extension {
   label: string;
   mount: AppExtensionMountEnum;
   url: string;
-  open(): void;
+  open: () => void;
 }
 
 export interface ExtensionWithParams extends Omit<Extension, "open"> {
-  open(params: AppDetailsUrlMountQueryParams): void;
+  open: (params: AppDetailsUrlMountQueryParams) => void;
 }
 
 export const extensionMountPoints = {
@@ -78,7 +78,7 @@ const filterAndMapToTarget = (
     }),
   );
 
-const mapToMenuItem = ({ label, id, open }: Extension) => ({
+const mapToMenuItem = ({ label, id, open }: ExtensionWithParams) => ({
   label,
   testId: `extension-${id}`,
   onSelect: open,
@@ -86,6 +86,13 @@ const mapToMenuItem = ({ label, id, open }: Extension) => ({
 
 export const mapToMenuItems = (extensions: ExtensionWithParams[]) =>
   extensions.map(mapToMenuItem);
+
+export const mapToMenuItemsForOrderListActions = (
+  extensions: ExtensionWithParams[],
+) =>
+  extensions.map(extension =>
+    mapToMenuItem({ ...extension, open: () => extension.open({}) }),
+  );
 
 export const mapToMenuItemsForProductOverviewActions = (
   extensions: ExtensionWithParams[],
@@ -159,7 +166,7 @@ export const useExtensions = <T extends AppExtensionMountEnum>(
 
   const extensionsMap = mountList.reduce(
     (extensionsMap, mount) => ({ ...extensionsMap, [mount]: [] }),
-    {} as Record<T, Extension[]>,
+    {} as Record<AppExtensionMountEnum, Extension[]>,
   );
 
   return extensions.reduce(

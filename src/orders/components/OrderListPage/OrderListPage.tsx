@@ -1,13 +1,14 @@
+// @ts-strict-ignore
 import {
   extensionMountPoints,
-  mapToMenuItems,
+  mapToMenuItemsForOrderListActions,
   useExtensions,
 } from "@dashboard/apps/hooks/useExtensions";
+import { useUserAccessibleChannels } from "@dashboard/auth/hooks/useUserAccessibleChannels";
 import { LimitsInfo } from "@dashboard/components/AppLayout/LimitsInfo";
 import { ListFilters } from "@dashboard/components/AppLayout/ListFilters";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
-import { ButtonWithSelect } from "@dashboard/components/ButtonWithSelect";
-import CardMenu from "@dashboard/components/CardMenu";
+import { ButtonWithDropdown } from "@dashboard/components/ButtonWithDropdown";
 import { useDevModeContext } from "@dashboard/components/DevModePanel/hooks";
 import { FilterPresetsSelect } from "@dashboard/components/FilterPresetsSelect";
 import { ListPageLayout } from "@dashboard/components/Layouts";
@@ -29,8 +30,7 @@ import {
 } from "@dashboard/types";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
 import { Card } from "@material-ui/core";
-import { makeStyles } from "@saleor/macaw-ui";
-import { Box, ChevronRightIcon } from "@saleor/macaw-ui/next";
+import { Box, Button, ChevronRightIcon, Tooltip } from "@saleor/macaw-ui-next";
 import React, { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -56,15 +56,6 @@ export interface OrderListPageProps
   onTabDelete: (tabIndex: number) => void;
 }
 
-const useStyles = makeStyles(
-  theme => ({
-    settings: {
-      marginRight: theme.spacing(2),
-    },
-  }),
-  { name: "OrderListPage" },
-);
-
 const OrderListPage: React.FC<OrderListPageProps> = ({
   initialSearch,
   filterOpts,
@@ -85,7 +76,8 @@ const OrderListPage: React.FC<OrderListPageProps> = ({
   ...listProps
 }) => {
   const intl = useIntl();
-  const classes = useStyles({});
+  const userAccessibleChannels = useUserAccessibleChannels();
+  const hasAccessibleChannels = userAccessibleChannels.length > 0;
   const filterStructure = createFilterStructure(intl, filterOpts);
   const limitsReached = isLimitReached(limits, "orders");
   const [isFilterPresetOpen, setFilterPresetOpen] = useState(false);
@@ -93,8 +85,12 @@ const OrderListPage: React.FC<OrderListPageProps> = ({
   const { ORDER_OVERVIEW_CREATE, ORDER_OVERVIEW_MORE_ACTIONS } = useExtensions(
     extensionMountPoints.ORDER_LIST,
   );
-  const extensionMenuItems = mapToMenuItems(ORDER_OVERVIEW_MORE_ACTIONS);
-  const extensionCreateButtonItems = mapToMenuItems(ORDER_OVERVIEW_CREATE);
+  const extensionMenuItems = mapToMenuItemsForOrderListActions(
+    ORDER_OVERVIEW_MORE_ACTIONS,
+  );
+  const extensionCreateButtonItems = mapToMenuItemsForOrderListActions(
+    ORDER_OVERVIEW_CREATE,
+  );
 
   const context = useDevModeContext();
 
@@ -128,7 +124,7 @@ const OrderListPage: React.FC<OrderListPageProps> = ({
           alignItems="center"
         >
           <Box display="flex">
-            <Box marginX={6} display="flex" alignItems="center">
+            <Box marginX={3} display="flex" alignItems="center">
               <ChevronRightIcon />
             </Box>
 
@@ -149,11 +145,10 @@ const OrderListPage: React.FC<OrderListPageProps> = ({
             />
           </Box>
 
-          <Box display="flex" alignItems="center" gap={5}>
+          <Box display="flex" alignItems="center" gap={2}>
             {!!onSettingsOpen && (
-              <CardMenu
-                className={classes.settings}
-                menuItems={[
+              <TopNav.Menu
+                items={[
                   {
                     label: intl.formatMessage({
                       id: "vEwjub",
@@ -174,18 +169,46 @@ const OrderListPage: React.FC<OrderListPageProps> = ({
                 ]}
               />
             )}
-            <ButtonWithSelect
-              disabled={limitsReached}
-              options={extensionCreateButtonItems}
-              data-test-id="create-order-button"
-              onClick={onAdd}
-            >
-              <FormattedMessage
-                id="LshEVn"
-                defaultMessage="Create order"
-                description="button"
-              />
-            </ButtonWithSelect>
+
+            <Tooltip>
+              <Tooltip.Trigger>
+                {extensionCreateButtonItems.length > 0 ? (
+                  <ButtonWithDropdown
+                    onClick={onAdd}
+                    testId={"create-order-button"}
+                    options={extensionCreateButtonItems}
+                    disabled={limitsReached || !hasAccessibleChannels}
+                  >
+                    <FormattedMessage
+                      id="LshEVn"
+                      defaultMessage="Create order"
+                      description="button"
+                    />
+                  </ButtonWithDropdown>
+                ) : (
+                  <Button
+                    data-test-id="create-order-button"
+                    onClick={onAdd}
+                    disabled={limitsReached || !hasAccessibleChannels}
+                  >
+                    <FormattedMessage
+                      id="LshEVn"
+                      defaultMessage="Create order"
+                      description="button"
+                    />
+                  </Button>
+                )}
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                {!hasAccessibleChannels && (
+                  <FormattedMessage
+                    defaultMessage="You don't have access to any channels"
+                    id="grkY2V"
+                  />
+                )}
+              </Tooltip.Content>
+            </Tooltip>
+
             {hasLimits(limits, "orders") && (
               <LimitsInfo
                 text={intl.formatMessage(

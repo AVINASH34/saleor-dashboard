@@ -38,7 +38,7 @@ const Warehouses: React.FC<WarehousesProps> = props => {
   const intl = useIntl();
 
   return (
-    <Card>
+    <Card data-test-id="warehouses-section">
       <CardTitle title={intl.formatMessage(sectionNames.warehouses)} />
       <CardContent>
         <Typography>{intl.formatMessage(messages.subtitle)}</Typography>
@@ -46,7 +46,7 @@ const Warehouses: React.FC<WarehousesProps> = props => {
       <AssignmentList
         loading={loading}
         items={warehouses}
-        itemsChoices={warehousesChoices}
+        itemsChoices={warehousesChoices!}
         addItem={addWarehouse}
         removeItem={removeWarehouse}
         searchItems={searchWarehouses}

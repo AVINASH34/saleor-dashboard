@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   listActionsProps,
   pageListProps,
@@ -18,7 +19,6 @@ const props: PermissionGroupListPageProps = {
   ...pageListProps.default,
   ...sortPageProps,
   disabled: false,
-  onDelete: () => undefined,
   sort: {
     ...sortPageProps.sort,
     sort: PermissionGroupListUrlSortField.name,

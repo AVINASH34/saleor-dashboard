@@ -22,6 +22,7 @@ import {
   VariantAttributeFragment,
 } from "@dashboard/graphql";
 import { FormsetData } from "@dashboard/hooks/useFormset";
+import { AttributeValuesMetadata } from "@dashboard/products/utils/data";
 import { RelayToFlat } from "@dashboard/types";
 import {
   mapEdgesToItems,
@@ -139,6 +140,7 @@ function getFileOrReferenceAttributeData(
 ) {
   return {
     ...getSimpleAttributeData(data, values),
+    values: [],
     availableInGrid: undefined,
     filterableInDashboard: undefined,
     filterableInStorefront: undefined,
@@ -231,7 +233,7 @@ export const mergeFileUploadErrors = (
       return [...errors, ...uploadErrors];
     }
     return errors;
-  }, []);
+  }, [] as UploadErrorFragment[]);
 
 export const mergeAttributeValueDeleteErrors = (
   deleteAttributeValuesResult: Array<FetchResult<AttributeValueDeleteMutation>>,
@@ -242,7 +244,7 @@ export const mergeAttributeValueDeleteErrors = (
       return [...errors, ...deleteErrors];
     }
     return errors;
-  }, []);
+  }, [] as AttributeErrorFragment[]);
 
 export const mergeChoicesWithValues = (
   attribute:
@@ -268,6 +270,22 @@ export const mergeAttributeValues = (
   return attribute?.value
     ? [...attribute.value, ...attributeValues]
     : attributeValues;
+};
+
+export const mergeAttributeValuesWithLabels = (
+  attributeId: string,
+  attributeMetadata: AttributeValuesMetadata[],
+  attributes: FormsetData<
+    AttributeInputData,
+    string[],
+    AttributeValuesMetadata[]
+  >,
+) => {
+  const attribute = attributes.find(attribute => attribute.id === attributeId);
+
+  return attribute?.metadata
+    ? [...attribute.metadata, ...attributeMetadata]
+    : attributeMetadata;
 };
 
 export const mergeAttributes = (

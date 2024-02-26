@@ -4,7 +4,10 @@ import faker from "faker";
 
 import { productDetailsUrl } from "../../../fixtures/urlList";
 import { ONE_PERMISSION_USERS } from "../../../fixtures/users";
-import { searchInShop } from "../../../support/api/requests/storeFront/Search";
+import {
+  expectProductVisibleInShop,
+  searchInShop,
+} from "../../../support/api/requests/storeFront/Search";
 import { getDefaultChannel } from "../../../support/api/utils/channelsUtils";
 import * as productsUtils from "../../../support/api/utils/products/productsUtils";
 import { isProductVisibleInSearchResult } from "../../../support/api/utils/storeFront/storeFrontProductUtils";
@@ -19,8 +22,7 @@ describe("Products displayed in listings", () => {
   let defaultChannel;
 
   before(() => {
-    cy.clearSessionData().loginUserViaRequest();
-    productsUtils.deleteProductsStartsWith(startsWith);
+    cy.loginUserViaRequest();
     productsUtils
       .createTypeAttributeAndCategoryForProduct({ name })
       .then(
@@ -47,10 +49,7 @@ describe("Products displayed in listings", () => {
   });
 
   beforeEach(() => {
-    cy.clearSessionData().loginUserViaRequest(
-      "auth",
-      ONE_PERMISSION_USERS.product,
-    );
+    cy.loginUserViaRequest("auth", ONE_PERMISSION_USERS.product);
   });
 
   it(
@@ -117,14 +116,7 @@ describe("Products displayed in listings", () => {
           cy.loginInShop();
         })
         .then(() => {
-          searchInShop(productName);
-        })
-        .then(resp => {
-          const isProductVisible = isProductVisibleInSearchResult(
-            resp,
-            productName,
-          );
-          expect(isProductVisible).to.be.eq(true);
+          expectProductVisibleInShop(productName);
         });
     },
   );

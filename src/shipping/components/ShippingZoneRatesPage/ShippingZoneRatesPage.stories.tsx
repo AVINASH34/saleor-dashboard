@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { ShippingMethodTypeEnum } from "@dashboard/graphql";
 import { shippingZone } from "@dashboard/shipping/fixtures";
 import { taxClasses } from "@dashboard/taxes/fixtures";
@@ -63,7 +64,7 @@ const props: ShippingZoneRatesPageProps = {
   toggleAll: () => undefined,
   toolbar: () => undefined,
   variant: ShippingMethodTypeEnum.PRICE,
-  formId: Symbol(),
+  formId: Symbol("shipping-zone-rates-details-form-id"),
   taxClasses,
   fetchMoreTaxClasses: undefined,
 };

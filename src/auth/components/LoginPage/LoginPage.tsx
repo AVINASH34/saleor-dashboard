@@ -26,10 +26,10 @@ export interface LoginCardProps {
   loading: boolean;
   externalAuthentications?: AvailableExternalAuthenticationsQuery["shop"]["availableExternalAuthentications"];
   onExternalAuthentication: (pluginId: string) => void;
-  onSubmit?: (event: LoginFormData) => SubmitPromise;
+  onSubmit: (event: LoginFormData) => SubmitPromise;
 }
 
-const LoginCard: React.FC<LoginCardProps> = props => {
+const LoginPage: React.FC<LoginCardProps> = props => {
   const {
     errors,
     disabled,
@@ -151,8 +151,8 @@ const LoginCard: React.FC<LoginCardProps> = props => {
               <FormSpacer />
               <Typography>
                 <FormattedMessage
-                  id="ENBELI"
-                  defaultMessage="or login using"
+                  id="aFU0vm"
+                  defaultMessage="or continue with"
                   description="description"
                 />
               </Typography>
@@ -179,5 +179,5 @@ const LoginCard: React.FC<LoginCardProps> = props => {
     </LoginForm>
   );
 };
-LoginCard.displayName = "LoginCard";
-export default LoginCard;
+LoginPage.displayName = "LoginPage";
+export default LoginPage;

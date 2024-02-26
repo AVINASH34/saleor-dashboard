@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { DashboardCard } from "@dashboard/components/Card";
 import ImageUpload from "@dashboard/components/ImageUpload";
 import MediaTile from "@dashboard/components/MediaTile";
@@ -12,7 +13,7 @@ import {
   List,
   sprinkles,
   Text,
-} from "@saleor/macaw-ui/next";
+} from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
@@ -70,8 +71,8 @@ interface ProductMediaProps {
   getImageEditUrl: (id: string) => string;
   onImageDelete: (id: string) => () => void;
   onImageReorder?: ReorderAction;
-  onImageUpload(file: File);
-  openMediaUrlModal();
+  onImageUpload: (file: File) => any;
+  openMediaUrlModal: () => any;
 }
 
 const ProductMedia: React.FC<ProductMediaProps> = props => {
@@ -134,16 +135,16 @@ const ProductMedia: React.FC<ProductMediaProps> = props => {
             </Dropdown.Trigger>
             <Dropdown.Content align="end">
               <List
-                padding={5}
+                padding={2}
                 borderRadius={4}
-                boxShadow="overlay"
-                backgroundColor="surfaceNeutralPlain"
+                boxShadow="defaultOverlay"
+                backgroundColor="default1"
               >
                 <Dropdown.Item>
                   <List.Item
                     borderRadius={4}
-                    paddingX={4}
-                    paddingY={5}
+                    paddingX={1.5}
+                    paddingY={2}
                     onClick={() => imagesUpload.current.click()}
                     data-test-id="upload-images"
                   >
@@ -153,8 +154,8 @@ const ProductMedia: React.FC<ProductMediaProps> = props => {
                 <Dropdown.Item>
                   <List.Item
                     borderRadius={4}
-                    paddingX={4}
-                    paddingY={5}
+                    paddingX={1.5}
+                    paddingY={2}
                     onClick={openMediaUrlModal}
                     data-test-id="upload-media-url"
                   >
@@ -183,7 +184,7 @@ const ProductMedia: React.FC<ProductMediaProps> = props => {
         </Box>
         <Box position="relative">
           {media === undefined ? (
-            <Box padding={8}>
+            <Box padding={5}>
               <Skeleton />
             </Box>
           ) : media.length > 0 ? (
@@ -211,9 +212,9 @@ const ProductMedia: React.FC<ProductMediaProps> = props => {
                     preview={imagesToUpload}
                     onSortEnd={onImageReorder}
                     className={sprinkles({
-                      display: "grid",
-                      gap: 8,
-                      gridTemplateColumns: { mobile: 2, tablet: 3, desktop: 4 },
+                      display: "flex",
+                      gap: 5,
+                      flexWrap: "wrap",
                       opacity: isDragActive ? "0.2" : "1",
                     })}
                     onDelete={onImageDelete}

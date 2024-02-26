@@ -9,13 +9,16 @@ import { getVariant } from "../../../support/api/requests/Product";
 import { getDefaultChannel } from "../../../support/api/utils/channelsUtils";
 import {
   createProductInChannelWithoutVariants,
-  deleteProductsStartsWith,
 } from "../../../support/api/utils/products/productsUtils";
-import { createProductTypeWithNewVariantSelectionAttribute } from "../../../support/api/utils/productTypeUtils";
-import { fillUpVariantDetails } from "../../../support/pages/catalog/products/VariantsPage";
+import {
+  createProductTypeWithNewVariantSelectionAttribute,
+} from "../../../support/api/utils/productTypeUtils";
+import {
+  fillUpVariantDetails,
+} from "../../../support/pages/catalog/products/VariantsPage";
 
 describe("As an admin I want to use attributes in variant selection", () => {
-  const startsWith = "VarSel";
+  const startsWith = "VarSel" + Date.now();
 
   const attributesTypes = [
     { key: "DROPDOWN", TC: "SALEOR_0534" },
@@ -27,8 +30,7 @@ describe("As an admin I want to use attributes in variant selection", () => {
   let category;
 
   before(() => {
-    cy.clearSessionData().loginUserViaRequest();
-    deleteProductsStartsWith(startsWith);
+    cy.loginUserViaRequest();
     getDefaultChannel().then(defaultChannel => (channel = defaultChannel));
     createCategory({ name: startsWith }).then(categoryResp => {
       category = categoryResp;
@@ -37,7 +39,7 @@ describe("As an admin I want to use attributes in variant selection", () => {
   });
 
   beforeEach(() => {
-    cy.clearSessionData().loginUserViaRequest();
+    cy.loginUserViaRequest();
   });
 
   attributesTypes.forEach(attributeType => {

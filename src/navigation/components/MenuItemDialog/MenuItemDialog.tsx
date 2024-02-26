@@ -1,6 +1,10 @@
+// @ts-strict-ignore
 import AutocompleteSelectMenu from "@dashboard/components/AutocompleteSelectMenu";
 import BackButton from "@dashboard/components/BackButton";
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import {
   MenuErrorFragment,
@@ -24,7 +28,6 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import isUrl from "is-url";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -205,7 +208,7 @@ const MenuItemDialog: React.FC<MenuItemDialogProps> = ({
     onQueryChange(query);
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<any>) => {
+  const handleSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     const menuItemData = getMenuItemData(value);
 

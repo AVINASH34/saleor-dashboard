@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import AddressFormatter from "@dashboard/components/AddressFormatter";
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
@@ -17,6 +18,7 @@ import {
 } from "@dashboard/graphql";
 import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { buttonMessages } from "@dashboard/intl";
+import { orderListUrl } from "@dashboard/orders/urls";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { Card, CardContent, Typography } from "@material-ui/core";
@@ -120,7 +122,9 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
         ) : isInEditMode && canEditCustomer ? (
           <Form confirmLeave initial={{ query: "" }}>
             {({ change, data }) => {
-              const handleChange = (event: React.ChangeEvent<any>) => {
+              const handleChange = (
+                event: React.ChangeEvent<HTMLInputElement>,
+              ) => {
                 change(event);
                 const value = event.target.value;
 
@@ -167,7 +171,23 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
               <FormattedMessage id="Qovenh" defaultMessage="Anonymous user" />
             </Typography>
           ) : (
-            <Typography className={classes.userEmail}>{userEmail}</Typography>
+            <>
+              <Typography className={classes.userEmail}>{userEmail}</Typography>
+              <div>
+                <Link
+                  underline={false}
+                  href={orderListUrl({
+                    customer: userEmail,
+                  })}
+                >
+                  <FormattedMessage
+                    id="J4NBVR"
+                    defaultMessage="View Orders"
+                    description="link"
+                  />
+                </Link>
+              </div>
+            </>
           )
         ) : (
           <>
@@ -243,7 +263,7 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
         </>
       )}
       <Hr />
-      <CardContent>
+      <CardContent data-test-id="shipping-address-section">
         <div className={classes.sectionHeader}>
           <Typography className={classes.sectionHeaderTitle}>
             <FormattedMessage id="DP5VOH" defaultMessage="Shipping Address" />
@@ -286,7 +306,7 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
         )}
       </CardContent>
       <Hr />
-      <CardContent>
+      <CardContent data-test-id="billing-address-section">
         <div className={classes.sectionHeader}>
           <Typography className={classes.sectionHeaderTitle}>
             <FormattedMessage id="c7/79+" defaultMessage="Billing Address" />

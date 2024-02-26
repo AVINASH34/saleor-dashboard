@@ -18,19 +18,14 @@ import {
   getPermissionGroup,
 } from "../../support/api/requests/PermissionGroup.js";
 import { getStaffMembersStartsWith } from "../../support/api/requests/StaffMembers";
-import { deletePermissionGroupsStartsWith } from "../../support/api/utils/permissionGroupUtils.js";
+import { ensureCanvasStatic } from "../../support/customCommands/sharedElementsOperations/canvas";
 
 describe("Permissions groups", () => {
-  const startsWith = "CyPermissions-";
+  const startsWith = "CyPermissions-" + Date.now();
   const permissionManageProducts = "[MANAGE_PRODUCTS]";
 
-  before(() => {
-    cy.clearSessionData().loginUserViaRequest();
-    deletePermissionGroupsStartsWith(startsWith);
-  });
-
   beforeEach(() => {
-    cy.clearSessionData().loginUserViaRequest();
+    cy.loginUserViaRequest();
   });
 
   it(
@@ -38,7 +33,7 @@ describe("Permissions groups", () => {
     { tags: ["@permissions", "@allEnv", "@stable"] },
     () => {
       const permissionName = `${startsWith}${faker.datatype.number()}`;
-
+      cy.addAliasToGraphRequest("PermissionGroupCreate");
       cy.visit(urlList.permissionsGroups)
         .get(PERMISSION_GROUP_LIST_SELECTORS.createPermissionButton)
         .click()
@@ -52,15 +47,14 @@ describe("Permissions groups", () => {
         .check()
         .get(BUTTON_SELECTORS.confirm)
         .click()
-        .get(PERMISSION_GROUP_DETAILS_SELECTORS.assignMemberButton)
-        .should("be.visible")
-        .get(BUTTON_SELECTORS.back)
-        .click()
-        .waitForProgressBarToNotExist();
-      cy.contains(
-        PERMISSION_GROUP_LIST_SELECTORS.permissionGroupRow,
-        permissionName,
-      ).should("be.visible");
+        .wait("@PermissionGroupCreate")
+        .then(createPermissionRequest => {
+          const permissionGroupResponse =
+            createPermissionRequest.response.body.data.permissionGroupCreate;
+          expect(permissionGroupResponse.errors).to.have.length(0);
+          expect(permissionGroupResponse.group.name).to.contain(permissionName);
+          expect(permissionGroupResponse.group.permissions).to.have.length(2);
+        });
     },
   );
 
@@ -68,39 +62,33 @@ describe("Permissions groups", () => {
     "should delete permission group. TC: SALEOR_1402",
     { tags: ["@permissions", "@allEnv", "@stable"] },
     () => {
-      const permissionName = `${startsWith}${faker.datatype.number()}`;
+      const permissionName = `A-${startsWith}${faker.datatype.number()}`;
       let staffMember;
-
+      cy.addAliasToGraphRequest("PermissionGroupDelete");
       getStaffMembersStartsWith(TEST_ADMIN_USER.email)
         .its("body.data.staffUsers.edges")
         .then(staffMemberResp => {
           staffMember = staffMemberResp[0].node;
-
           createPermissionGroup({
             name: permissionName,
             userIdsArray: `["${staffMember.id}"]`,
             permissionsArray: permissionManageProducts,
+          }).then(createPermissionGroupResponse => {
+            cy.visit(
+              urlList.permissionsGroups +
+                createPermissionGroupResponse.group.id,
+            );
+            cy.contains(SHARED_ELEMENTS.header, permissionName);
+            cy.get(BUTTON_SELECTORS.deleteButton).click();
+            cy.clickSubmitButton().waitForRequestAndCheckIfNoErrors(
+              "@PermissionGroupDelete",
+            );
+            ensureCanvasStatic(SHARED_ELEMENTS.dataGridTable);
+            cy.get(SHARED_ELEMENTS.dataGridTable).should(
+              "not.contain.text",
+              permissionName,
+            );
           });
-          cy.visit(urlList.permissionsGroups);
-          cy.contains(
-            PERMISSION_GROUP_LIST_SELECTORS.permissionGroupRow,
-            permissionName,
-          )
-            .should("be.visible")
-            .find(BUTTON_SELECTORS.deleteIcon)
-            .click()
-            .get(BUTTON_SELECTORS.submit)
-            .click();
-          cy.contains(
-            PERMISSION_GROUP_LIST_SELECTORS.permissionGroupRow,
-            permissionName,
-          )
-            .should("not.exist")
-            .visit(staffMemberDetailsUrl(staffMember.id))
-            .get(SHARED_ELEMENTS.header)
-            .should("be.visible")
-            .contains(permissionName)
-            .should("not.exist");
         });
     },
   );

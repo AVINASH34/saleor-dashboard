@@ -1,3 +1,5 @@
+// @ts-strict-ignore
+import { LazyQueryResult } from "@apollo/client/react";
 import {
   extensionMountPoints,
   mapToMenuItems,
@@ -6,6 +8,7 @@ import {
 } from "@dashboard/apps/hooks/useExtensions";
 import { ListFilters } from "@dashboard/components/AppLayout/ListFilters";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
+import { BulkDeleteButton } from "@dashboard/components/BulkDeleteButton";
 import { ButtonWithDropdown } from "@dashboard/components/ButtonWithDropdown";
 import { getByName } from "@dashboard/components/Filter/utils";
 import { FilterPresetsSelect } from "@dashboard/components/FilterPresetsSelect";
@@ -13,17 +16,17 @@ import { ListPageLayout } from "@dashboard/components/Layouts";
 import LimitReachedAlert from "@dashboard/components/LimitReachedAlert";
 import { ProductListColumns } from "@dashboard/config";
 import {
+  Exact,
   GridAttributesQuery,
   ProductListQuery,
   RefreshLimitsQuery,
-  SearchAvailableInGridAttributesQuery,
+  useAvailableColumnAttributesLazyQuery,
 } from "@dashboard/graphql";
 import useLocalStorage from "@dashboard/hooks/useLocalStorage";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { sectionNames } from "@dashboard/intl";
 import {
   ChannelProps,
-  FetchMoreProps,
   FilterPageProps,
   PageListProps,
   RelayToFlat,
@@ -31,13 +34,12 @@ import {
 } from "@dashboard/types";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
 import { Card } from "@material-ui/core";
-import { Box, Button, ChevronRightIcon, Text } from "@saleor/macaw-ui/next";
+import { Box, Button, ChevronRightIcon, Text } from "@saleor/macaw-ui-next";
 import React, { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { ProductListUrlSortField, productUrl } from "../../urls";
 import { ProductListDatagrid } from "../ProductListDatagrid";
-import { ProductListDeleteButton } from "../ProductListDeleteButton";
 import { ProductListTiles } from "../ProductListTiles/ProductListTiles";
 import { ProductListViewSwitch } from "../ProductListViewSwitch";
 import {
@@ -52,29 +54,30 @@ export interface ProductListPageProps
       FilterPageProps<ProductFilterKeys, ProductListFilterOpts>,
       "onTabDelete"
     >,
-    FetchMoreProps,
     SortPage<ProductListUrlSortField>,
     ChannelProps {
   activeAttributeSortId: string;
-  availableInGridAttributes: RelayToFlat<
-    SearchAvailableInGridAttributesQuery["availableInGrid"]
-  >;
-  columnQuery: string;
   currencySymbol: string;
-  gridAttributes: RelayToFlat<GridAttributesQuery["grid"]>;
+  gridAttributesOpts: LazyQueryResult<
+    GridAttributesQuery,
+    Exact<{
+      ids: string | string[];
+    }>
+  >;
   limits: RefreshLimitsQuery["shop"]["limits"];
   products: RelayToFlat<ProductListQuery["products"]>;
   selectedProductIds: string[];
   hasPresetsChanged: boolean;
   onAdd: () => void;
   onExport: () => void;
-  onColumnQueryChange: (query: string) => void;
   onTabUpdate: (tabName: string) => void;
   onTabDelete: (tabIndex: number) => void;
+  availableColumnsAttributesOpts: ReturnType<
+    typeof useAvailableColumnAttributesLazyQuery
+  >;
   onProductsDelete: () => void;
   onSelectProductIds: (ids: number[], clearSelection: () => void) => void;
   clearRowSelection: () => void;
-  setBulkDeleteButtonRef: (ref: HTMLButtonElement) => void;
 }
 
 export type ProductListViewType = "datagrid" | "tile";
@@ -82,21 +85,16 @@ const DEFAULT_PRODUCT_LIST_VIEW_TYPE: ProductListViewType = "datagrid";
 
 export const ProductListPage: React.FC<ProductListPageProps> = props => {
   const {
-    columnQuery,
     currencySymbol,
     defaultSettings,
-    gridAttributes,
+    gridAttributesOpts,
     limits,
-    availableInGridAttributes,
+    availableColumnsAttributesOpts,
     filterOpts,
-    hasMore,
     initialSearch,
-    loading,
     settings,
     onAdd,
-    onColumnQueryChange,
     onExport,
-    onFetchMore,
     onFilterChange,
     onFilterAttributeFocus,
     onSearchChange,
@@ -114,7 +112,6 @@ export const ProductListPage: React.FC<ProductListPageProps> = props => {
     selectedProductIds,
     onProductsDelete,
     clearRowSelection,
-    setBulkDeleteButtonRef,
     ...listProps
   } = props;
   const intl = useIntl();
@@ -156,7 +153,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = props => {
           alignItems="center"
         >
           <Box display="flex">
-            <Box marginX={6} display="flex" alignItems="center">
+            <Box marginX={3} display="flex" alignItems="center">
               <ChevronRightIcon />
             </Box>
 
@@ -178,7 +175,7 @@ export const ProductListPage: React.FC<ProductListPageProps> = props => {
               })}
             />
           </Box>
-          <Box display="flex" alignItems="center" gap={5}>
+          <Box display="flex" alignItems="center" gap={2}>
             {hasLimits(limits, "productVariants") && (
               <Text variant="caption">
                 {intl.formatMessage(
@@ -267,12 +264,15 @@ export const ProductListPage: React.FC<ProductListPageProps> = props => {
               defaultMessage: "Search Products...",
             })}
             actions={
-              <Box display="flex" gap={7}>
-                <ProductListDeleteButton
-                  ref={setBulkDeleteButtonRef}
-                  onClick={onProductsDelete}
-                  show={selectedProductIds.length > 0}
-                />
+              <Box display="flex" gap={4}>
+                {selectedProductIds.length > 0 && (
+                  <BulkDeleteButton onClick={onProductsDelete}>
+                    <FormattedMessage
+                      defaultMessage="Delete products"
+                      id="uwk5e9"
+                    />
+                  </BulkDeleteButton>
+                )}
                 <ProductListViewSwitch
                   defaultValue={storedProductListViewType}
                   setProductListViewType={props => {
@@ -290,20 +290,18 @@ export const ProductListPage: React.FC<ProductListPageProps> = props => {
             hasRowHover={!isFilterPresetOpen}
             filterDependency={filterDependency}
             activeAttributeSortId={activeAttributeSortId}
-            columnQuery={columnQuery}
             defaultSettings={defaultSettings}
-            availableInGridAttributes={availableInGridAttributes}
-            isAttributeLoading={loading}
+            availableColumnsAttributesOpts={availableColumnsAttributesOpts}
             loading={listProps.disabled}
-            hasMore={hasMore}
-            gridAttributes={gridAttributes}
-            onColumnQueryChange={onColumnQueryChange}
-            onFetchMore={onFetchMore}
+            gridAttributesOpts={gridAttributesOpts}
             products={listProps.products}
             settings={settings}
             selectedChannelId={selectedChannelId}
             onUpdateListSettings={onUpdateListSettings}
             rowAnchor={productUrl}
+            onRowClick={id => {
+              navigate(productUrl(id));
+            }}
           />
         ) : (
           <ProductListTiles

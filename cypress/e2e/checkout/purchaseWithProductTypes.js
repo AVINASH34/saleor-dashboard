@@ -33,7 +33,7 @@ describe("As an unlogged customer I want to order physical and digital products"
   let physicalVariants;
 
   before(() => {
-    cy.clearSessionData().loginUserViaRequest();
+    cy.loginUserViaRequest();
     createDigitalAndPhysicalProductWithNewDataAndDefaultChannel({
       physicalProductName: physicalName,
       digitalProductName: digitalName,
@@ -54,12 +54,12 @@ describe("As an unlogged customer I want to order physical and digital products"
   });
 
   beforeEach(() => {
-    cy.clearSessionData().loginUserViaRequest();
+    cy.loginUserViaRequest();
   });
 
   it(
-    "should purchase digital product as unlogged customer. TC: SALEOR_0402",
-    { tags: ["@checkout", "@allEnv", "@stable", "@oldRelease"] },
+    "should purchase digital product as unlogged customer. TC: SALEOR_0402 - should not be migrated to playwright",
+    { tags: ["@checkout", "@allEnv", "@stable", "@oldRelease", "@critical"] },
     () => {
       createAndCompleteCheckoutWithoutShipping({
         channelSlug: defaultChannel.slug,
@@ -82,8 +82,8 @@ describe("As an unlogged customer I want to order physical and digital products"
   );
 
   it(
-    "should purchase physical product as unlogged customer. TC: SALEOR_0403",
-    { tags: ["@checkout", "@allEnv", "@stable", "@oldRelease"] },
+    "should purchase physical product as unlogged customer. TC: SALEOR_0403 should not be migrated to playwright",
+    { tags: ["@checkout", "@allEnv", "@stable", "@oldRelease", "@critical"] },
     () => {
       createWaitingForCaptureOrder({
         channelSlug: defaultChannel.slug,

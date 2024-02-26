@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import { ChannelsAvailabilityDropdown } from "@dashboard/components/ChannelsAvailabilityDropdown";
@@ -156,6 +157,7 @@ const CollectionProducts: React.FC<CollectionProductsProps> = props => {
 
               return (
                 <TableRowLink
+                  data-test-id="assign-product-table-row"
                   className={classes.tableRow}
                   hover={!!product}
                   href={product && productUrl(product.id)}

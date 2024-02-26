@@ -6,16 +6,14 @@ import useWarehouseSearch from "@dashboard/searches/useWarehouseSearch";
 
 export const useWarehouses = () => {
   const userPermissions = useUserPermissions();
-  const canLoadWarehouses = hasOneOfPermissions(userPermissions, [
+  const canLoadWarehouses = hasOneOfPermissions(userPermissions!, [
     PermissionEnum.MANAGE_SHIPPING,
     PermissionEnum.MANAGE_ORDERS,
     PermissionEnum.MANAGE_PRODUCTS,
   ]);
 
-  const {
-    data: warehousesCountData,
-    loading: warehousesCountLoading,
-  } = useWarehousesCountQuery({ skip: !canLoadWarehouses });
+  const { data: warehousesCountData, loading: warehousesCountLoading } =
+    useWarehousesCountQuery({ skip: !canLoadWarehouses });
 
   const {
     loadMore: fetchMoreWarehouses,

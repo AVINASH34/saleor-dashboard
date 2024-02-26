@@ -1,17 +1,18 @@
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import HorizontalSpacer from "@dashboard/components/HorizontalSpacer";
+import Link from "@dashboard/components/Link";
 import Money from "@dashboard/components/Money";
 import { Pill } from "@dashboard/components/Pill";
 import Skeleton from "@dashboard/components/Skeleton";
+import { giftCardPath } from "@dashboard/giftCards/urls";
 import {
   OrderAction,
   OrderDetailsFragment,
-  OrderDiscountType,
   OrderStatus,
 } from "@dashboard/graphql";
 import { Card, CardContent } from "@material-ui/core";
-import { Divider } from "@saleor/macaw-ui/next";
+import { Divider } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -19,7 +20,12 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { transformPaymentStatus } from "../../../misc";
 import { orderPaymentMessages, paymentButtonMessages } from "./messages";
 import { useStyles } from "./styles";
-import { extractOrderGiftCardUsedAmount, extractRefundedAmount } from "./utils";
+import {
+  extractOrderGiftCardUsedAmount,
+  extractRefundedAmount,
+  getDiscountTypeLabel,
+  obtainUsedGifrcard,
+} from "./utils";
 
 interface OrderPaymentProps {
   order: OrderDetailsFragment;
@@ -44,6 +50,7 @@ const OrderPayment: React.FC<OrderPaymentProps> = props => {
   const payment = transformPaymentStatus(order?.paymentStatus, intl);
   const refundedAmount = extractRefundedAmount(order);
   const usedGiftCardAmount = extractOrderGiftCardUsedAmount(order);
+  const usedGiftcard = obtainUsedGifrcard(order);
 
   const getDeliveryMethodName = (order: OrderDetailsFragment) => {
     if (
@@ -81,6 +88,7 @@ const OrderPayment: React.FC<OrderPaymentProps> = props => {
                 className={classes.rightmostLeftAlignedElement}
                 label={payment.localized}
                 color={payment.status}
+                data-test-id="payment-status"
               />
               {order?.status !== OrderStatus.CANCELED &&
                 (canCapture || canRefund || canVoid || canMarkAsPaid) && (
@@ -124,15 +132,11 @@ const OrderPayment: React.FC<OrderPaymentProps> = props => {
       <CardContent className={classes.payments}>
         <div className={classes.root}>
           {order?.discounts?.map(discount => (
-            <div>
+            <div key={discount.id}>
               <FormattedMessage {...orderPaymentMessages.discount} />
               <HorizontalSpacer spacing={4} />
               <span className={classes.supportText}>
-                {discount.type === OrderDiscountType.MANUAL ? (
-                  <FormattedMessage {...orderPaymentMessages.staffAdded} />
-                ) : (
-                  <FormattedMessage {...orderPaymentMessages.voucher} />
-                )}
+                <FormattedMessage {...getDiscountTypeLabel(discount.type)} />
               </span>
               <span
                 className={clsx(
@@ -208,9 +212,18 @@ const OrderPayment: React.FC<OrderPaymentProps> = props => {
       <Divider />
       <CardContent className={classes.payments}>
         <div className={classes.root}>
-          {!!usedGiftCardAmount && (
+          {!!usedGiftCardAmount && usedGiftcard && (
             <div>
-              <FormattedMessage {...orderPaymentMessages.paidWithGiftCard} />
+              <FormattedMessage
+                {...orderPaymentMessages.paidWithGiftCard}
+                values={{
+                  link: (
+                    <Link href={giftCardPath(usedGiftcard.id)}>
+                      {usedGiftcard.last4CodeChars}
+                    </Link>
+                  ),
+                }}
+              />
               <div className={classes.leftmostRightAlignedElement}>
                 <Money
                   money={{
@@ -248,7 +261,10 @@ const OrderPayment: React.FC<OrderPaymentProps> = props => {
             )}
           >
             <FormattedMessage {...orderPaymentMessages.outstanding} />
-            <div className={classes.leftmostRightAlignedElement}>
+            <div
+              className={classes.leftmostRightAlignedElement}
+              data-test-id="order-balance-status"
+            >
               {order?.totalBalance.amount === 0 ? (
                 <FormattedMessage {...orderPaymentMessages.settled} />
               ) : (

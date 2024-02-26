@@ -3,7 +3,7 @@ import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { sectionNames } from "@dashboard/intl";
 import { ListProps } from "@dashboard/types";
-import { Box, sprinkles, Text } from "@saleor/macaw-ui/next";
+import { Box, sprinkles, Text } from "@saleor/macaw-ui-next";
 import React, { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -80,15 +80,15 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        marginY={8}
+        marginY={5}
       >
-        <Box className={classes.appContent} marginY={8}>
+        <Box className={classes.appContent} marginY={5}>
           {nothingInstalled && (
-            <Box paddingY={6}>
-              <Text as="h3" variant="heading" color="textNeutralSubdued">
+            <Box paddingY={3}>
+              <Text as="h3" variant="heading" color="default2">
                 {intl.formatMessage(messages.installedApps)}
               </Text>
-              <Box marginTop={6}>
+              <Box marginTop={3}>
                 <Text variant="caption">
                   {intl.formatMessage(messages.nothingInstalledPlaceholder)}
                 </Text>
@@ -97,8 +97,8 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
           )}
           {sectionsAvailability.installed && (
             <>
-              <Box paddingX={8} paddingY={6}>
-                <Text as="h3" variant="heading" color="textNeutralSubdued">
+              <Box paddingX={5} paddingY={3}>
+                <Text as="h3" variant="heading" color="default2">
                   {intl.formatMessage(messages.installedApps)}
                 </Text>
               </Box>
@@ -113,11 +113,11 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
           )}
           <MarketplaceAlert error={marketplaceError} />
           {sectionsAvailability.all && !marketplaceError && (
-            <Box marginTop={10}>
+            <Box marginTop={7}>
               <Text
                 as="h3"
                 variant="heading"
-                color="textNeutralSubdued"
+                color="default2"
                 className={sprinkles({ paddingX: 8 })}
               >
                 <FormattedMessage {...messages.allApps} />
@@ -131,11 +131,11 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
             </Box>
           )}
           {sectionsAvailability.comingSoon && !marketplaceError && (
-            <Box marginTop={10}>
+            <Box marginTop={7}>
               <Text
                 as="h3"
                 variant="heading"
-                color="textNeutralSubdued"
+                color="default2"
                 className={sprinkles({ paddingX: 8 })}
               >
                 {intl.formatMessage(messages.comingSoonApps)}

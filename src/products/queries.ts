@@ -61,10 +61,13 @@ export const productListQuery = gql`
     $last: Int
     $before: String
     $filter: ProductFilterInput
+    $search: String
+    $where: ProductWhereInput
     $channel: String
     $sort: ProductOrder
     $hasChannel: Boolean!
-    $hasSelectedAttributes: Boolean!
+    $includeCategories: Boolean!
+    $includeCollections: Boolean!
   ) {
     products(
       before: $before
@@ -72,6 +75,8 @@ export const productListQuery = gql`
       first: $first
       last: $last
       filter: $filter
+      search: $search
+      where: $where
       sortBy: $sort
       channel: $channel
     ) {
@@ -80,7 +85,7 @@ export const productListQuery = gql`
           ...ProductWithChannelListings
           updatedAt
           description
-          attributes @include(if: $hasSelectedAttributes) {
+          attributes {
             ...ProductListAttribute
           }
         }
@@ -250,12 +255,75 @@ export const productMediaQuery = gql`
 `;
 
 export const gridAttributes = gql`
-  query GridAttributes($ids: [ID!]!) {
-    grid: attributes(first: 25, filter: { ids: $ids }) {
+  query GridAttributes($ids: [ID!]!, $hasAttributes: Boolean!) {
+    availableAttributes: attributes(first: 10) {
       edges {
         node {
           id
           name
+        }
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+    selectedAttributes: attributes(first: 25, filter: { ids: $ids })
+      @include(if: $hasAttributes) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const availableColumnAttribues = gql`
+  query AvailableColumnAttributes(
+    $search: String!
+    $before: String
+    $after: String
+    $first: Int
+    $last: Int
+  ) {
+    attributes(
+      filter: { search: $search }
+      before: $before
+      after: $after
+      first: $first
+      last: $last
+    ) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+`;
+
+export const gridWarehouses = gql`
+  query GridWarehouses($ids: [ID!]!, $hasWarehouses: Boolean!) {
+    availableWarehouses: warehouses(first: 10) {
+      edges {
+        node {
+          ...Warehouse
+        }
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+    selectedWarehouses: warehouses(first: 100, filter: { ids: $ids })
+      @include(if: $hasWarehouses) {
+      edges {
+        node {
+          ...Warehouse
         }
       }
     }

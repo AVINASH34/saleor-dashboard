@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import avatarImage from "@assets/images/avatars/avatar.png";
 import { permissions } from "@dashboard/fixtures";
 import {
@@ -154,6 +155,7 @@ export const staffMember: StaffMemberDetailsFragment = {
     ...p,
     __typename: "UserPermission",
   })),
+  metadata: [],
 };
 
 export const staffMemberAvatar: StaffMemberAvatarFragment = {

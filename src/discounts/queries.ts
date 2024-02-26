@@ -31,6 +31,35 @@ export const saleList = gql`
   }
 `;
 
+export const discountList = gql`
+  query PromotionsList(
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+    $where: PromotionWhereInput
+    $sort: PromotionSortingInput
+  ) {
+    promotions(
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+      where: $where
+      sortBy: $sort
+    ) {
+      edges {
+        node {
+          ...Promotion
+        }
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+`;
+
 export const voucherList = gql`
   query VoucherList(
     $after: String
@@ -93,6 +122,148 @@ export const voucherDetails = gql`
   ) {
     voucher(id: $id) {
       ...VoucherDetails
+    }
+  }
+`;
+
+export const voucherCodes = gql`
+  query VoucherCodes(
+    $id: ID!
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    voucher(id: $id) {
+      codes(first: $first, last: $last, before: $before, after: $after) {
+        edges {
+          node {
+            ...VoucherCode
+          }
+        }
+        pageInfo {
+          ...PageInfo
+        }
+      }
+    }
+  }
+`;
+
+export const promotionDetails = gql`
+  query PromotionDetails($id: ID!) {
+    promotion(id: $id) {
+      ...PromotionDetails
+    }
+  }
+`;
+
+export const ruleConditionsSelectedOptionsDetails = gql`
+  query RuleConditionsSelectedOptionsDetails(
+    $categoriesIds: [ID!]
+    $collectionsIds: [ID!]
+    $productsIds: [ID!]
+    $variantsIds: [ID!]
+  ) {
+    categories(first: 100, where: { ids: $categoriesIds }) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+
+    collections(first: 100, where: { ids: $collectionsIds }) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+
+    products(first: 100, where: { ids: $productsIds }) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+
+    productVariants(first: 100, where: { ids: $variantsIds }) {
+      edges {
+        node {
+          id
+          name
+          product {
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const giftLabels = gql`
+  query GiftLabels($ids: [ID!]) {
+    productVariants(first: 100, where: { ids: $ids }) {
+      edges {
+        node {
+          id
+          name
+          product {
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const PromotionDetailsQuery = /* GraphQL */ `
+  query PromotionDetailsQuery($id: ID!) {
+    promotion(id: $id) {
+      id
+      name
+      description
+      startDate
+      endDate
+      type
+      rules {
+        id
+        name
+        description
+        channels {
+          id
+          isActive
+          name
+          slug
+          currencyCode
+          defaultCountry {
+            code
+            country
+          }
+          stockSettings {
+            allocationStrategy
+          }
+          hasOrders
+          orderSettings {
+            markAsPaidStrategy
+            deleteExpiredOrdersAfter
+            allowUnpaidOrders
+          }
+          paymentSettings {
+            defaultTransactionFlowStrategy
+          }
+        }
+        giftIds
+        rewardType
+        rewardValueType
+        rewardValue
+        cataloguePredicate
+        orderPredicate
+      }
     }
   }
 `;

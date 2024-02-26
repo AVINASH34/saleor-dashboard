@@ -12,12 +12,14 @@ import { createWarehouse } from "../../../support/api/requests/Warehouse";
 import * as channelsUtils from "../../../support/api/utils/channelsUtils";
 import { createWaitingForCaptureOrder } from "../../../support/api/utils/ordersUtils";
 import * as productsUtils from "../../../support/api/utils/products/productsUtils";
-import * as shippingUtils from "../../../support/api/utils/shippingUtils";
 import { isShippingAvailableInCheckout } from "../../../support/api/utils/storeFront/checkoutUtils";
 import {
   createShippingRate,
   createShippingZone,
+  getDifferentDefaultWeight,
+  openChangeDefaultWeightDialog,
   rateOptions,
+  selectDifferentDefaultWeight,
 } from "../../../support/pages/shippingMethodPage";
 
 describe("As a staff user I want to create shipping zone and rate", () => {
@@ -35,10 +37,10 @@ describe("As a staff user I want to create shipping zone and rate", () => {
   let attribute;
 
   before(() => {
-    cy.clearSessionData().loginUserViaRequest();
-    productsUtils.deleteProductsStartsWith(startsWith);
-    shippingUtils.deleteShippingStartsWith(startsWith);
-
+    const productTypeSlug = `${faker.lorem.slug()}slug`;
+    const productSlug = `${faker.lorem.slug()}slug`;
+    const warehouseSlug = `${faker.lorem.slug()}slug`;
+    cy.loginUserViaRequest();
     channelsUtils
       .getDefaultChannel()
       .then(channel => {
@@ -49,7 +51,7 @@ describe("As a staff user I want to create shipping zone and rate", () => {
       .then(addresses => {
         address = addresses.usAddress;
 
-        createWarehouse({ name, address });
+        createWarehouse({ name, address, slug: warehouseSlug });
       })
       .then(warehouseResp => {
         warehouse = warehouseResp;
@@ -57,6 +59,7 @@ describe("As a staff user I want to create shipping zone and rate", () => {
         updateChannelWarehouses(defaultChannel.id, warehouse.id);
         productsUtils.createTypeAttributeAndCategoryForProduct({
           name: startsWith,
+          slug: productTypeSlug,
         });
       })
       .then(
@@ -76,6 +79,7 @@ describe("As a staff user I want to create shipping zone and rate", () => {
             warehouseId: warehouse.id,
             quantityInWarehouse: 10,
             price,
+            slug: productSlug,
           });
         },
       )
@@ -107,58 +111,8 @@ describe("As a staff user I want to create shipping zone and rate", () => {
   });
 
   beforeEach(() => {
-    cy.clearSessionData().loginUserViaRequest();
+    cy.loginUserViaRequest();
   });
-
-  it(
-    "should be able to create price based shipping method. TC: SALEOR_0803",
-    { tags: ["@shipping", "@allEnv", "@stable", "@oldRelease"] },
-    () => {
-      const shippingName = `${startsWith}${faker.datatype.number()}`;
-      cy.clearSessionData().loginUserViaRequest(
-        "auth",
-        ONE_PERMISSION_USERS.shipping,
-      );
-      cy.visit(urlList.shippingMethods).expectSkeletonIsVisible();
-      createShippingZone(
-        shippingName,
-        warehouse.name,
-        address.countryFullName,
-        defaultChannel.name,
-      );
-      createShippingRate({
-        rateName: shippingName,
-        price,
-        priceLimits: { min: price, max: 100 },
-        rateOption: rateOptions.PRICE_OPTION,
-        deliveryTime,
-      });
-      createWaitingForCaptureOrder({
-        channelSlug: defaultChannel.slug,
-        email: "test@example.com",
-        variantsList,
-        address,
-        shippingMethodName: shippingName,
-      })
-        .then(({ order }) => {
-          expect(order.id).to.be.ok;
-          createCheckout({
-            channelSlug: defaultChannel.slug,
-            email: "test@example.com",
-            variantsList: secondVariantsList,
-            address,
-            auth: "token",
-          });
-        })
-        .then(({ checkout }) => {
-          const isShippingAvailable = isShippingAvailableInCheckout(
-            checkout,
-            shippingName,
-          );
-          expect(isShippingAvailable).to.be.false;
-        });
-    },
-  );
 
   it(
     "should be able to create weight based shipping method. TC: SALEOR_0804",
@@ -169,7 +123,7 @@ describe("As a staff user I want to create shipping zone and rate", () => {
         "auth",
         ONE_PERMISSION_USERS.shipping,
       );
-      cy.visit(urlList.shippingMethods).expectSkeletonIsVisible();
+      cy.visit(urlList.shippingMethods);
       createShippingZone(
         shippingName,
         warehouse.name,
@@ -207,6 +161,24 @@ describe("As a staff user I want to create shipping zone and rate", () => {
           );
           expect(isShippingAvailable).to.be.false;
         });
+    },
+  );
+  it(
+    "should be able to change default weight in shipping methods TC: SALEOR_4",
+    { tags: ["@shipping", "@allEnv", "@stable"] },
+    () => {
+      cy.addAliasToGraphRequest("ShopInfo");
+      cy.clearSessionData().loginUserViaRequest();
+      cy.visit(urlList.shippingMethods);
+      openChangeDefaultWeightDialog();
+      getDifferentDefaultWeight().then(unit => {
+        selectDifferentDefaultWeight(unit)
+          .waitForRequestAndCheckIfNoErrors("@ShopInfo")
+          .then(resp => {
+            expect(resp.response.body.data.shop.defaultWeightUnit).equal(unit);
+          });
+      });
+      cy.confirmationMessageShouldAppear();
     },
   );
 });

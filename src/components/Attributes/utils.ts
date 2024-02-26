@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { AttributeInput } from "@dashboard/components/Attributes/Attributes";
 import { FileChoiceType } from "@dashboard/components/FileUploadField";
 import { MultiAutocompleteChoiceType } from "@dashboard/components/MultiAutocompleteSelectField";
@@ -73,6 +74,17 @@ export function getReferenceDisplayValue(
     // If value has not been yet assigned, use data of reference
     if (!!definedAttributeReference) {
       return definedAttributeReference;
+    }
+
+    // If value has not been yet assigned and data
+    // is no longer available, use metadata
+    if (attribute.metadata) {
+      return {
+        label: attribute.metadata.find(
+          metadata => metadata.value === attributeValue,
+        )?.label,
+        value: attributeValue,
+      };
     }
 
     return {

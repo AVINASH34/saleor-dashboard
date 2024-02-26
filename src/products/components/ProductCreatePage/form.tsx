@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   getAttributesDisplayData,
   getRichTextAttributesFromMap,
@@ -10,6 +11,7 @@ import {
   createAttributeFileChangeHandler,
   createAttributeMultiChangeHandler,
   createAttributeReferenceChangeHandler,
+  createAttributeReferenceMetadataHandler,
   createAttributeValueReorderHandler,
   createFetchMoreReferencesHandler,
   createFetchReferencesHandler,
@@ -40,10 +42,12 @@ import useForm, {
 import useFormset, {
   FormsetChange,
   FormsetData,
+  FormsetMetadataChange,
 } from "@dashboard/hooks/useFormset";
 import useHandleFormSubmit from "@dashboard/hooks/useHandleFormSubmit";
 import { errorMessages } from "@dashboard/intl";
 import {
+  AttributeValuesMetadata,
   getAttributeInputFromProductType,
   ProductType,
 } from "@dashboard/products/utils/data";
@@ -59,13 +63,14 @@ import {
 } from "@dashboard/products/utils/validation";
 import { PRODUCT_CREATE_FORM_ID } from "@dashboard/products/views/ProductCreate/consts";
 import { FetchMoreProps, RelayToFlat, ReorderEvent } from "@dashboard/types";
-import createMultiAutocompleteSelectHandler from "@dashboard/utils/handlers/multiAutocompleteSelectChangeHandler";
+import createMultiselectChangeHandler from "@dashboard/utils/handlers/multiselectChangeHandler";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
 import { RichTextContext } from "@dashboard/utils/richText/context";
 import { useMultipleRichText } from "@dashboard/utils/richText/useMultipleRichText";
 import useRichText from "@dashboard/utils/richText/useRichText";
 import { OutputData } from "@editorjs/editorjs";
+import { Option } from "@saleor/macaw-ui-next";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -75,7 +80,7 @@ import { ProductStockFormsetData, ProductStockInput } from "../ProductStocks";
 export interface ProductCreateFormData extends MetadataFormData {
   category: string;
   channelListings: ChannelData[];
-  collections: string[];
+  collections: Option[];
   description: OutputData;
   isAvailable: boolean;
   name: string;
@@ -129,6 +134,9 @@ export interface ProductCreateHandlers
   changePreorderEndDate: FormChange;
   fetchReferences: (value: string) => void;
   fetchMoreReferences: FetchMoreProps;
+  selectAttributeReferenceMetadata: FormsetMetadataChange<
+    AttributeValuesMetadata[]
+  >;
 }
 export interface UseProductCreateFormOutput
   extends CommonUseFormResultWithHandlers<
@@ -227,7 +235,7 @@ function useProductCreateForm(
 
   const {
     triggerChange,
-    toggleValue,
+    toggleValues,
     handleChange,
     data: formData,
     formId,
@@ -252,15 +260,12 @@ function useProductCreateForm(
     triggerChange,
   });
 
-  const {
-    makeChangeHandler: makeMetadataChangeHandler,
-  } = useMetadataChangeTrigger();
+  const { makeChangeHandler: makeMetadataChangeHandler } =
+    useMetadataChangeTrigger();
 
-  const handleCollectionSelect = createMultiAutocompleteSelectHandler(
-    toggleValue,
+  const handleCollectionSelect = createMultiselectChangeHandler(
+    toggleValues,
     opts.setSelectedCollections,
-    opts.selectedCollections,
-    opts.collections,
   );
   const handleCategorySelect = createSingleAutocompleteSelectHandler(
     handleChange,
@@ -278,6 +283,10 @@ function useProductCreateForm(
   );
   const handleAttributeReferenceChange = createAttributeReferenceChangeHandler(
     attributes.change,
+    triggerChange,
+  );
+  const handleAttributeMetadataChange = createAttributeReferenceMetadataHandler(
+    attributes.setMetadata,
     triggerChange,
   );
   const handleFetchReferences = createFetchReferencesHandler(
@@ -404,13 +413,10 @@ function useProductCreateForm(
     return errors;
   };
 
-  const {
-    setExitDialogSubmitRef,
-    setIsSubmitDisabled,
-    setIsDirty,
-  } = useExitFormDialog({
-    formId: PRODUCT_CREATE_FORM_ID,
-  });
+  const { setExitDialogSubmitRef, setIsSubmitDisabled, setIsDirty } =
+    useExitFormDialog({
+      formId: PRODUCT_CREATE_FORM_ID,
+    });
 
   useEffect(() => setExitDialogSubmitRef(submit), [submit]);
 
@@ -471,6 +477,7 @@ function useProductCreateForm(
       selectAttributeFile: handleAttributeFileChange,
       selectAttributeMultiple: handleAttributeMultiChange,
       selectAttributeReference: handleAttributeReferenceChange,
+      selectAttributeReferenceMetadata: handleAttributeMetadataChange,
       selectCategory: handleCategorySelect,
       selectCollection: handleCollectionSelect,
       selectProductType: handleProductTypeSelect,

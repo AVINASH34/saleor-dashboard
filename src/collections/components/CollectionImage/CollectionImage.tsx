@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import Hr from "@dashboard/components/Hr";
@@ -8,7 +9,7 @@ import { CollectionDetailsFragment } from "@dashboard/graphql";
 import { commonMessages } from "@dashboard/intl";
 import { Card, CardContent, TextField } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { vars } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -34,7 +35,7 @@ const useStyles = makeStyles(
     },
     imageContainer: {
       background: "#ffffff",
-      border: `1px solid ${vars.colors.border.neutralPlain}`,
+      border: `1px solid ${vars.colors.border.default1}`,
       borderRadius: theme.spacing(),
       height: 148,
       justifySelf: "start",
@@ -78,7 +79,11 @@ export const CollectionImage: React.FC<CollectionImageProps> = props => {
         })}
         toolbar={
           <>
-            <Button variant="tertiary" onClick={handleImageUploadButtonClick}>
+            <Button
+              variant="tertiary"
+              onClick={handleImageUploadButtonClick}
+              data-test-id="upload-image-button"
+            >
               <FormattedMessage {...commonMessages.uploadImage} />
             </Button>
             <input

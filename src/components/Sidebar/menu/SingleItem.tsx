@@ -2,7 +2,7 @@ import {
   extensionMountPoints,
   useExtensions,
 } from "@dashboard/apps/hooks/useExtensions";
-import { Box, List, sprinkles, Text } from "@saleor/macaw-ui/next";
+import { Box, List, sprinkles, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -21,19 +21,18 @@ export const SingleItem: React.FC<Props> = ({ menuItem }) => {
     const extension = getMenuItemExtension(extensions, menuItem.id);
     if (extension) {
       extension.open();
-      return;
     }
   };
   return (
     <List.Item
       borderRadius={3}
-      paddingX={5}
+      paddingX={2}
       active={active}
       onClick={handleMenuItemClick}
       data-test-id={`menu-item-label-${menuItem.id}`}
     >
       <Link
-        to={menuItem.url}
+        to={menuItem.url || ""}
         replace={active}
         className={sprinkles({
           display: "block",
@@ -42,8 +41,8 @@ export const SingleItem: React.FC<Props> = ({ menuItem }) => {
       >
         <Box
           className={sprinkles({
-            paddingY: 4,
-            gap: 6,
+            paddingY: 1.5,
+            gap: 3,
             display: "flex",
             alignItems: "center",
           })}

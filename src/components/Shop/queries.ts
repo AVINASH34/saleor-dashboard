@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { gql } from "@apollo/client";
 import {
   RefreshLimitsQuery,
@@ -26,8 +27,7 @@ export const shopInfo = gql`
       name
       trackInventoryByDefault
       permissions {
-        code
-        name
+        ...Permission
       }
       version
     }

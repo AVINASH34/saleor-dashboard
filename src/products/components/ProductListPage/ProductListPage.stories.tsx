@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import placeholderImage from "@assets/images/placeholder255x255.png";
 import { defaultListSettings } from "@dashboard/config";
 import {
@@ -9,12 +10,14 @@ import {
   pageListProps,
   sortPageProps,
 } from "@dashboard/fixtures";
-import { products as productListFixture } from "@dashboard/products/fixtures";
+import {
+  gridAttributesResult,
+  products as productListFixture,
+} from "@dashboard/products/fixtures";
 import { ProductListUrlSortField } from "@dashboard/products/urls";
 import { productListFilterOpts } from "@dashboard/products/views/ProductList/fixtures";
-import { attributes } from "@dashboard/productTypes/fixtures";
 import { ListViews } from "@dashboard/types";
-import React from "react";
+import { Meta, StoryObj } from "@storybook/react";
 
 import { PaginatorContextDecorator } from "../../../../.storybook/decorators";
 import ProductListPage, { ProductListPageProps } from "./ProductListPage";
@@ -40,20 +43,24 @@ const props: ProductListPageProps = {
     hasPresetsChanged: false,
     onTabSave: () => undefined,
     onTabUpdate: () => undefined,
-    availableInGridAttributes: [],
+    availableColumnsAttributesOpts: [
+      () => undefined,
+      { data: undefined },
+    ] as any,
     onColumnQueryChange: () => undefined,
   },
   activeAttributeSortId: undefined,
   currencySymbol: "USD",
   defaultSettings: defaultListSettings[ListViews.PRODUCT_LIST],
   filterOpts: productListFilterOpts,
-  gridAttributes: attributes,
+  gridAttributesOpts: {
+    data: gridAttributesResult,
+  } as any,
   limits,
   onExport: () => undefined,
   products,
   selectedChannelId: "123",
   selectedProductIds: ["123"],
-  setBulkDeleteButtonRef: () => undefined,
   clearRowSelection: () => undefined,
   settings: {
     ...pageListProps.default.settings,
@@ -61,38 +68,85 @@ const props: ProductListPageProps = {
   },
 };
 
-export default {
+const meta: Meta<typeof ProductListPage> = {
   title: "Products / Product list",
   decorators: [PaginatorContextDecorator],
+  component: ProductListPage,
+};
+export default meta;
+type Story = StoryObj<typeof ProductListPage>;
+
+export const Default: Story = {
+  args: {
+    ...props,
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
 };
 
-export const Default = () => <ProductListPage {...props} />;
+export const Loading: Story = {
+  args: {
+    ...props,
+    products: undefined,
+    currentTab: undefined,
+    disabled: true,
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.9, pauseAnimationAtEnd: true },
+  },
+};
 
-export const Loading = () => (
-  <ProductListPage
-    {...props}
-    products={undefined}
-    currentTab={undefined}
-    disabled={true}
-  />
-);
+export const WithData: Story = {
+  args: {
+    ...props,
+    products,
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
+};
 
-export const WithData = () => (
-  <ProductListPage {...props} products={products} />
-);
+export const NoData: Story = {
+  args: {
+    ...props,
+    products: [],
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
+};
 
-export const NoData = () => <ProductListPage {...props} products={[]} />;
+export const NoChannels: Story = {
+  args: {
+    ...props,
+    selectedChannelId: "",
+    products: products.map(product => ({
+      ...product,
+      channelListings: [],
+    })),
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
+};
 
-export const NoChannels = () => (
-  <ProductListPage
-    {...props}
-    selectedChannelId={""}
-    products={products.map(product => ({ ...product, channelListings: [] }))}
-  />
-);
+export const NoLimits: Story = {
+  args: {
+    ...props,
+    limits: undefined,
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
+};
 
-export const NoLimits = () => <ProductListPage {...props} limits={undefined} />;
-
-export const LimitsReached = () => (
-  <ProductListPage {...props} limits={limitsReached} />
-);
+export const LimitsReached: Story = {
+  args: {
+    ...props,
+    limits: limitsReached,
+  },
+  parameters: {
+    chromatic: { diffThreshold: 0.85 },
+  },
+};

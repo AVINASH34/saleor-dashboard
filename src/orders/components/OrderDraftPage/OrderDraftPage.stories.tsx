@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import placeholderImage from "@assets/images/placeholder60x60.png";
 import { fetchMoreProps } from "@dashboard/fixtures";
 import { OrderErrorCode, OrderErrorFragment } from "@dashboard/graphql";
@@ -43,12 +44,14 @@ const order = draftOrder(placeholderImage);
 
 const props: Omit<OrderDraftPageProps, "classes"> = {
   ...fetchMoreProps,
+  loading: false,
   disabled: false,
   fetchUsers: () => undefined,
   onBillingAddressEdit: undefined,
   onCustomerEdit: () => undefined,
   onDraftFinalize: () => undefined,
   onDraftRemove: () => undefined,
+  onShowMetadata: () => undefined,
   onNoteAdd: undefined,
   onOrderLineAdd: () => undefined,
   onOrderLineChange: () => undefined,

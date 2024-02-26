@@ -1,4 +1,8 @@
-import ConfirmButton from "@dashboard/components/ConfirmButton";
+// @ts-strict-ignore
+import {
+  ConfirmButton,
+  ConfirmButtonTransitionState,
+} from "@dashboard/components/ConfirmButton";
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
 import TableCellAvatar from "@dashboard/components/TableCellAvatar";
 import TableRowLink from "@dashboard/components/TableRowLink";
@@ -18,11 +22,11 @@ import {
   TableCell,
   TextField,
 } from "@material-ui/core";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React, { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage, useIntl } from "react-intl";
 
+import { Container } from "../AssignContainerDialog";
 import BackButton from "../BackButton";
 import Checkbox from "../Checkbox";
 import { messages } from "./messages";
@@ -39,7 +43,7 @@ export interface AssignProductDialogProps extends FetchMoreProps, DialogProps {
   selectedIds?: Record<string, boolean>;
   loading: boolean;
   onFetch: (value: string) => void;
-  onSubmit: (data: string[]) => void;
+  onSubmit: (data: Container[]) => void;
 }
 
 const scrollableTargetId = "assignProductScrollableDialog";
@@ -90,7 +94,12 @@ const AssignProductDialog: React.FC<AssignProductDialogProps> = props => {
       .filter(key => productsDict[key])
       .map(key => key);
 
-    onSubmit(selectedProductsAsArray);
+    onSubmit(
+      selectedProductsAsArray.map(id => ({
+        id,
+        name: products.find(product => product.id === id)?.name,
+      })),
+    );
   };
 
   const handleChange = productId => {
@@ -100,9 +109,14 @@ const AssignProductDialog: React.FC<AssignProductDialogProps> = props => {
     }));
   };
 
+  const handleClose = () => {
+    queryReset();
+    onClose();
+  };
+
   return (
     <Dialog
-      onClose={onClose}
+      onClose={handleClose}
       open={open}
       classes={{ paper: scrollableDialogClasses.dialog }}
       fullWidth

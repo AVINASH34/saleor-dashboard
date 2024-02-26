@@ -1,5 +1,5 @@
 import { Alert, AlertProps } from "@saleor/macaw-ui";
-import { sprinkles } from "@saleor/macaw-ui/next";
+import { sprinkles } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import React from "react";
 
@@ -13,7 +13,7 @@ const LimitReachedAlert: React.FC<LimitReachedAlertProps> = props => (
     className={clsx(
       sprinkles({
         gridColumn: "8",
-        marginBottom: 5,
+        marginBottom: 2,
       }),
       "remove-icon-background",
     )}

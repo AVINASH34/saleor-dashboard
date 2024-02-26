@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   LanguageCodeEnum,
   useAttributeTranslationDetailsQuery,
@@ -25,6 +26,8 @@ import TranslationsAttributesPage, {
 } from "../components/TranslationsAttributesPage";
 import { TranslationField } from "../types";
 
+type HandleSubmitData = string | OutputData;
+
 export interface TranslationsAttributesQueryParams extends Pagination {
   activeField: string;
 }
@@ -47,10 +50,8 @@ const TranslationsAttributes: React.FC<TranslationsAttributesProps> = ({
   const { updateListSettings, settings } = useListSettings(
     ListViews.TRANSLATION_ATTRIBUTE_VALUE_LIST,
   );
-  const [
-    valuesPaginationState,
-    setValuesPaginationState,
-  ] = useLocalPaginationState(settings?.rowNumber);
+  const [valuesPaginationState, setValuesPaginationState] =
+    useLocalPaginationState(settings?.rowNumber);
 
   const attributeTranslations = useAttributeTranslationDetailsQuery({
     variables: {
@@ -74,21 +75,19 @@ const TranslationsAttributes: React.FC<TranslationsAttributesProps> = ({
     valuesPaginationState,
   );
 
-  const [
-    updateAttributeTranslations,
-    updateAttributeTranslationsOpts,
-  ] = useUpdateAttributeTranslationsMutation({
-    onCompleted: data => {
-      if (data.attributeTranslate.errors.length === 0) {
-        attributeTranslations.refetch();
-        notify({
-          status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
-        });
-        navigate("?", { replace: true });
-      }
-    },
-  });
+  const [updateAttributeTranslations, updateAttributeTranslationsOpts] =
+    useUpdateAttributeTranslationsMutation({
+      onCompleted: data => {
+        if (data.attributeTranslate.errors.length === 0) {
+          attributeTranslations.refetch();
+          notify({
+            status: "success",
+            text: intl.formatMessage(commonMessages.savedChanges),
+          });
+          navigate("?", { replace: true });
+        }
+      },
+    });
 
   const [
     updateAttributeValueTranslations,
@@ -119,10 +118,7 @@ const TranslationsAttributes: React.FC<TranslationsAttributesProps> = ({
     navigate("?", { replace: true });
   };
 
-  const handleSubmit = (
-    { name }: TranslationField,
-    data: string | OutputData,
-  ) => {
+  const handleSubmit = ({ name }: TranslationField, data: HandleSubmitData) => {
     const [fieldName, fieldId] = name.split(":");
 
     if (fieldName === fieldNames.attribute) {

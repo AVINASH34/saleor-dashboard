@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { useEffect, useState } from "react";
 
 export interface PageInfo {
@@ -62,9 +63,8 @@ export function useSectionLocalPaginationState(
   section: string,
 ): [PaginationState, (paginationState: PaginationState) => void] {
   const [paginationSection, setPaginationSection] = useState(section);
-  const [paginationState, setPaginationState] = useLocalPaginationState(
-    paginateBy,
-  );
+  const [paginationState, setPaginationState] =
+    useLocalPaginationState(paginateBy);
 
   const fallbackPaginationState = {
     first: paginateBy,
@@ -88,13 +88,20 @@ export function useSectionLocalPaginationState(
   ];
 }
 
+export interface LocalPagination {
+  loadNextPage: () => void;
+  loadPreviousPage: () => void;
+  paginatorType: "click";
+  pageInfo?: PageInfo;
+}
+
 function useLocalPaginator(
   setPaginationState: (paginationState: PaginationState) => void,
 ) {
   function paginate(
     pageInfo: PageInfo | undefined,
     paginationState: PaginationState,
-  ) {
+  ): LocalPagination {
     const loadNextPage = () =>
       setPaginationState({
         ...paginationState,

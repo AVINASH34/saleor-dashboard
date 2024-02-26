@@ -1,5 +1,7 @@
+// @ts-strict-ignore
 import DialogButtons from "@dashboard/components/ActionDialog/DialogButtons";
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import VerticalSpacer from "@dashboard/components/VerticalSpacer";
 import GiftCardTagInput from "@dashboard/giftCards/components/GiftCardTagInput";
 import {
@@ -13,7 +15,6 @@ import { commonMessages } from "@dashboard/intl";
 import Label from "@dashboard/orders/components/OrderHistory/Label";
 import { getFormErrors } from "@dashboard/utils/errors";
 import { DialogContent, Divider, TextField } from "@material-ui/core";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -146,7 +147,10 @@ const GiftCardCreateDialogForm: React.FC<GiftCardCreateDialogFormProps> = ({
 
   return (
     <>
-      <DialogContent className={classes.dialogContent}>
+      <DialogContent
+        className={classes.dialogContent}
+        data-test-id="gift-card-dialog"
+      >
         <GiftCardCreateMoneyInput {...commonFormProps} set={set} />
         <CardSpacer />
         <GiftCardTagInput
@@ -170,6 +174,7 @@ const GiftCardCreateDialogForm: React.FC<GiftCardCreateDialogFormProps> = ({
         <GiftCardCreateExpirySelect {...commonFormProps} />
         <VerticalSpacer />
         <TextField
+          data-test-id="note-field"
           name="note"
           onChange={change}
           multiline

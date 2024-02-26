@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   ChannelData,
   createSortedChannelsData,
@@ -65,9 +66,8 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
   const notify = useNotifier();
   const shop = useShop();
   const intl = useIntl();
-  const [productCreateComplete, setProductCreateComplete] = React.useState(
-    false,
-  );
+  const [productCreateComplete, setProductCreateComplete] =
+    React.useState(false);
   const selectedProductTypeId = params["product-type-id"];
 
   const handleSelectProductType = (productTypeId: string) =>
@@ -90,6 +90,7 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
   } = useCategorySearch({
     variables: DEFAULT_INITIAL_SEARCH_DATA,
   });
+
   const {
     loadMore: loadMoreCollections,
     search: searchCollection,
@@ -139,9 +140,8 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
     mapEdgesToItems(searchProductTypesOpts?.data?.search) || [];
 
   const { availableChannels } = useAppChannel(false);
-  const allChannels: ChannelData[] = createSortedChannelsData(
-    availableChannels,
-  );
+  const allChannels: ChannelData[] =
+    createSortedChannelsData(availableChannels);
 
   const {
     channelListElements,
@@ -189,33 +189,27 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
 
   const [uploadFile, uploadFileOpts] = useFileUploadMutation({});
 
-  const [
-    updateChannels,
-    updateChannelsOpts,
-  ] = useProductChannelListingUpdateMutation({});
-  const [
-    updateVariantChannels,
-    updateVariantChannelsOpts,
-  ] = useProductVariantChannelListingUpdateMutation({});
+  const [updateChannels, updateChannelsOpts] =
+    useProductChannelListingUpdateMutation({});
+  const [updateVariantChannels, updateVariantChannelsOpts] =
+    useProductVariantChannelListingUpdateMutation({});
 
   const [productCreate, productCreateOpts] = useProductCreateMutation({});
   const [deleteProduct] = useProductDeleteMutation({});
-  const [
-    productVariantCreate,
-    productVariantCreateOpts,
-  ] = useVariantCreateMutation({
-    onCompleted: data => {
-      const errors = data.productVariantCreate.errors;
-      if (errors.length) {
-        errors.map(error =>
-          notify({
-            status: "error",
-            text: getProductErrorMessage(error, intl),
-          }),
-        );
-      }
-    },
-  });
+  const [productVariantCreate, productVariantCreateOpts] =
+    useVariantCreateMutation({
+      onCompleted: data => {
+        const errors = data.productVariantCreate.errors;
+        if (errors.length) {
+          errors.map(error =>
+            notify({
+              status: "error",
+              text: getProductErrorMessage(error, intl),
+            }),
+          );
+        }
+      },
+    });
 
   const handleSubmit = async (data: ProductCreateData) => {
     const errors = await createMetadataCreateHandler(
@@ -282,8 +276,9 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
     onFetchMore: loadMoreProducts,
   };
   const fetchMoreAttributeValues = {
-    hasMore: !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
-      ?.hasNextPage,
+    hasMore:
+      !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo
+        ?.hasNextPage,
     loading: !!searchAttributeValuesOpts.loading,
     onFetchMore: loadMoreAttributeValues,
   };
@@ -336,8 +331,9 @@ export const ProductCreateView: React.FC<ProductCreateProps> = ({ params }) => {
         categories={mapEdgesToItems(searchCategoryOpts?.data?.search) || []}
         collections={mapEdgesToItems(searchCollectionOpts?.data?.search) || []}
         attributeValues={
-          mapEdgesToItems(searchAttributeValuesOpts?.data?.attribute.choices) ||
-          []
+          mapEdgesToItems(
+            searchAttributeValuesOpts?.data?.attribute?.choices,
+          ) ?? []
         }
         loading={loading}
         channelsErrors={channelsErrors}

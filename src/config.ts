@@ -6,7 +6,7 @@ export const getAppDefaultUri = () => "/";
 export const getAppMountUri = () =>
   window?.__SALEOR_CONFIG__?.APP_MOUNT_URI || getAppDefaultUri();
 export const getApiUrl = () => window.__SALEOR_CONFIG__.API_URL;
-export const SW_INTERVAL = parseInt(process.env.SW_INTERVAL, 10) || 300;
+export const SW_INTERVAL = parseInt(process.env.SW_INTERVAL ?? "300", 10);
 export const IS_CLOUD_INSTANCE =
   window.__SALEOR_CONFIG__.IS_CLOUD_INSTANCE === "true";
 
@@ -32,15 +32,19 @@ export const PAGINATE_BY = 20;
 export const VALUES_PAGINATE_BY = 10;
 
 export type ProductListColumns =
+  | "name"
   | "productType"
   | "description"
   | "availability"
   | "price"
-  | "date";
+  | "date"
+  | "productCategory"
+  | "productCollections";
 
 export interface AppListViewSettings {
   [ListViews.APPS_LIST]: ListSettings;
   [ListViews.ATTRIBUTE_VALUE_LIST]: ListSettings;
+  [ListViews.ATTRIBUTE_LIST]: ListSettings;
   [ListViews.CATEGORY_LIST]: ListSettings;
   [ListViews.COLLECTION_LIST]: ListSettings;
   [ListViews.CUSTOMER_LIST]: ListSettings;
@@ -51,6 +55,7 @@ export interface AppListViewSettings {
   [ListViews.PLUGINS_LIST]: ListSettings;
   [ListViews.PRODUCT_LIST]: ListSettings<ProductListColumns>;
   [ListViews.SALES_LIST]: ListSettings;
+  [ListViews.DISCOUNTS_LIST]: ListSettings;
   [ListViews.SHIPPING_METHODS_LIST]: ListSettings;
   [ListViews.STAFF_MEMBERS_LIST]: ListSettings;
   [ListViews.PERMISSION_GROUP_LIST]: ListSettings;
@@ -59,7 +64,14 @@ export interface AppListViewSettings {
   [ListViews.WEBHOOK_LIST]: ListSettings;
   [ListViews.TRANSLATION_ATTRIBUTE_VALUE_LIST]: ListSettings;
   [ListViews.GIFT_CARD_LIST]: ListSettings;
+  [ListViews.ORDER_DETAILS_LIST]: ListSettings;
+  [ListViews.ORDER_DRAFT_DETAILS_LIST]: ListSettings;
+  [ListViews.PRODUCT_DETAILS]: ListSettings;
+  [ListViews.VOUCHER_CODES]: ListSettings;
+  [ListViews.ORDER_REFUNDS]: ListSettings;
 }
+// TODO: replace with
+// type AppListViewSettings = Record<ListViews, ListSettings>;
 
 export const defaultListSettings: AppListViewSettings = {
   [ListViews.APPS_LIST]: {
@@ -68,49 +80,76 @@ export const defaultListSettings: AppListViewSettings = {
   [ListViews.ATTRIBUTE_VALUE_LIST]: {
     rowNumber: 10,
   },
+  [ListViews.ATTRIBUTE_LIST]: {
+    rowNumber: 10,
+    columns: ["slug", "name", "visible", "searchable", "use-in-faceted-search"],
+  },
   [ListViews.CATEGORY_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "products", "subcategories"],
   },
   [ListViews.COLLECTION_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "productCount", "availability"],
   },
   [ListViews.CUSTOMER_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "email", "orders"],
   },
   [ListViews.DRAFT_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["number", "date", "customer", "total"],
   },
   [ListViews.NAVIGATION_LIST]: {
     rowNumber: PAGINATE_BY,
   },
   [ListViews.ORDER_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["number", "date", "customer", "payment", "status", "total"],
   },
   [ListViews.PAGES_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["title", "slug", "visible"],
   },
   [ListViews.PLUGINS_LIST]: {
     rowNumber: PAGINATE_BY,
   },
   [ListViews.PRODUCT_LIST]: {
-    columns: ["availability", "description", "price", "productType", "date"],
+    columns: [
+      "name",
+      "availability",
+      "description",
+      "price",
+      "productType",
+      "date",
+    ],
     rowNumber: PAGINATE_BY,
   },
   [ListViews.SALES_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "startDate", "endDate", "value"],
+  },
+  [ListViews.DISCOUNTS_LIST]: {
+    rowNumber: PAGINATE_BY,
+    columns: ["name", "type", "startDate", "endDate"],
   },
   [ListViews.SHIPPING_METHODS_LIST]: {
+    columns: ["name", "countries"],
     rowNumber: PAGINATE_BY,
   },
   [ListViews.STAFF_MEMBERS_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "email", "status"],
   },
   [ListViews.PERMISSION_GROUP_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["name", "members"],
   },
   [ListViews.VOUCHER_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["code", "min-spent", "start-date", "end-date", "value", "limit"],
   },
+
   [ListViews.WAREHOUSE_LIST]: {
     rowNumber: PAGINATE_BY,
   },
@@ -122,6 +161,45 @@ export const defaultListSettings: AppListViewSettings = {
   },
   [ListViews.GIFT_CARD_LIST]: {
     rowNumber: PAGINATE_BY,
+    columns: ["giftCardCode", "status", "tag", "product", "usedBy", "balance"],
+  },
+  [ListViews.ORDER_DETAILS_LIST]: {
+    rowNumber: PAGINATE_BY,
+    columns: [
+      "product",
+      "sku",
+      "variantName",
+      "quantity",
+      "price",
+      "total",
+      "isGift",
+      "metadata",
+    ],
+  },
+  [ListViews.ORDER_DRAFT_DETAILS_LIST]: {
+    rowNumber: PAGINATE_BY,
+    columns: [
+      "product",
+      "status",
+      "sku",
+      "variantName",
+      "quantity",
+      "price",
+      "total",
+      "isGift",
+      "metadata",
+    ],
+  },
+  [ListViews.PRODUCT_DETAILS]: {
+    rowNumber: PAGINATE_BY,
+    columns: ["name", "sku"],
+  },
+  [ListViews.VOUCHER_CODES]: {
+    rowNumber: PAGINATE_BY,
+  },
+  [ListViews.ORDER_REFUNDS]: {
+    rowNumber: PAGINATE_BY,
+    columns: ["status", "amount", "reason", "date", "account"],
   },
 };
 

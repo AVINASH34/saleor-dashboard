@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import ChannelAllocationStrategy from "@dashboard/channels/components/ChannelAllocationStrategy";
 import ShippingZones from "@dashboard/channels/components/ShippingZones";
 import Warehouses from "@dashboard/channels/components/Warehouses";
@@ -5,6 +6,7 @@ import { channelsListUrl } from "@dashboard/channels/urls";
 import { validateChannelFormData } from "@dashboard/channels/validation";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardSpacer from "@dashboard/components/CardSpacer";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import RequirePermissions from "@dashboard/components/RequirePermissions";
@@ -21,7 +23,10 @@ import {
   SearchWarehousesQuery,
   StockSettingsInput,
 } from "@dashboard/graphql";
-import { MarkAsPaidStrategyEnum } from "@dashboard/graphql/types.generated";
+import {
+  MarkAsPaidStrategyEnum,
+  TransactionFlowStrategyEnum,
+} from "@dashboard/graphql/types.generated";
 import { SearchData } from "@dashboard/hooks/makeTopLevelSearch";
 import { getParsedSearchData } from "@dashboard/hooks/makeTopLevelSearch/utils";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
@@ -30,7 +35,6 @@ import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { mapCountriesToChoices } from "@dashboard/utils/maps";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -105,8 +109,13 @@ const ChannelDetailsPage = function <TErrors extends ChannelErrorFragment[]>({
 
   const countryChoices = mapCountriesToChoices(countries || []);
 
-  const { defaultCountry, stockSettings, orderSettings, ...formData } =
-    channel || ({} as ChannelDetailsFragment);
+  const {
+    defaultCountry,
+    stockSettings,
+    orderSettings,
+    paymentSettings,
+    ...formData
+  } = channel || ({} as ChannelDetailsFragment);
   const initialStockSettings: StockSettingsInput = {
     allocationStrategy: AllocationStrategyEnum.PRIORITIZE_SORTING_ORDER,
     ...stockSettings,
@@ -125,6 +134,10 @@ const ChannelDetailsPage = function <TErrors extends ChannelErrorFragment[]>({
     shippingZonesToDisplay: channelShippingZones,
     warehousesToDisplay: channelWarehouses,
     markAsPaidStrategy: orderSettings?.markAsPaidStrategy,
+    deleteExpiredOrdersAfter: orderSettings?.deleteExpiredOrdersAfter,
+    allowUnpaidOrders: orderSettings?.allowUnpaidOrders,
+    defaultTransactionFlowStrategy:
+      paymentSettings?.defaultTransactionFlowStrategy,
   };
 
   const getFilteredShippingZonesChoices = (
@@ -204,6 +217,16 @@ const ChannelDetailsPage = function <TErrors extends ChannelErrorFragment[]>({
           });
         };
 
+        const handleTransactionFlowStrategyChange = () => {
+          set({
+            defaultTransactionFlowStrategy:
+              data.defaultTransactionFlowStrategy ===
+              TransactionFlowStrategyEnum.CHARGE
+                ? TransactionFlowStrategyEnum.AUTHORIZATION
+                : TransactionFlowStrategyEnum.CHARGE,
+          });
+        };
+
         const allErrors = [...errors, ...validationErrors];
 
         return (
@@ -231,6 +254,9 @@ const ChannelDetailsPage = function <TErrors extends ChannelErrorFragment[]>({
                 onCurrencyCodeChange={handleCurrencyCodeSelect}
                 onDefaultCountryChange={handleDefaultCountrySelect}
                 onMarkAsPaidStrategyChange={handleMarkAsPaidStrategyChange}
+                onTransactionFlowStrategyChange={
+                  handleTransactionFlowStrategyChange
+                }
                 errors={allErrors}
               />
             </DetailPageLayout.Content>

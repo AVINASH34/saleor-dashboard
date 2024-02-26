@@ -1,7 +1,9 @@
+// @ts-strict-ignore
 import { ChannelVoucherData } from "@dashboard/channels/utils";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import ChannelsAvailabilityCard from "@dashboard/components/ChannelsAvailabilityCard";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import CountryList from "@dashboard/components/CountryList";
 import Form from "@dashboard/components/Form";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
@@ -26,11 +28,12 @@ import {
   VoucherDetailsFragment,
   VoucherTypeEnum,
 } from "@dashboard/graphql";
+import { UseListSettings } from "@dashboard/hooks/useListSettings";
+import { LocalPagination } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { mapEdgesToItems, mapMetadataItemToInput } from "@dashboard/utils/maps";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
 import { Typography } from "@material-ui/core";
-import { ConfirmButtonTransitionState } from "@saleor/macaw-ui";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -40,6 +43,9 @@ import DiscountCategories from "../DiscountCategories";
 import DiscountCollections from "../DiscountCollections";
 import DiscountDates from "../DiscountDates";
 import DiscountProducts from "../DiscountProducts";
+import { VoucherCodes } from "../VoucherCodes";
+import { VoucherCode } from "../VoucherCodesDatagrid/types";
+import { GenerateMultipleVoucherCodeFormData } from "../VoucherCodesGenerateDialog";
 import VoucherInfo from "../VoucherInfo";
 import VoucherLimits from "../VoucherLimits";
 import VoucherRequirements from "../VoucherRequirements";
@@ -62,7 +68,7 @@ export interface VoucherDetailsPageFormData extends MetadataFormData {
   applyOncePerOrder: boolean;
   onlyForStaff: boolean;
   channelListings: ChannelVoucherData[];
-  code: string;
+  name: string;
   discountType: DiscountTypeEnum;
   endDate: string;
   endTime: string;
@@ -73,8 +79,10 @@ export interface VoucherDetailsPageFormData extends MetadataFormData {
   startDate: string;
   startTime: string;
   type: VoucherTypeEnum;
+  codes: VoucherCode[];
   usageLimit: number;
   used: number;
+  singleUse: boolean;
 }
 
 export interface VoucherDetailsPageProps
@@ -90,6 +98,11 @@ export interface VoucherDetailsPageProps
   voucher: VoucherDetailsFragment;
   allChannelsCount: number;
   channelListings: ChannelVoucherData[];
+  selectedVoucherCodesIds: string[];
+  voucherCodes: VoucherCode[];
+  addedVoucherCodes: VoucherCode[];
+  voucherCodesLoading: boolean;
+  onSelectVoucherCodesIds: (rows: number[], clearSelection: () => void) => void;
   onCategoryAssign: () => void;
   onCategoryUnassign: (id: string) => void;
   onCollectionAssign: () => void;
@@ -103,6 +116,14 @@ export interface VoucherDetailsPageProps
   onTabClick: (index: VoucherDetailsPageTab) => void;
   onChannelsChange: (data: ChannelVoucherData[]) => void;
   openChannelsModal: () => void;
+  onMultipleVoucheCodesGenerate: (
+    data: GenerateMultipleVoucherCodeFormData,
+  ) => void;
+  onCustomVoucherCodeGenerate: (code: string) => void;
+  onDeleteVoucherCodes: () => void;
+  onVoucherCodesSettingsChange: UseListSettings["updateListSettings"];
+  voucherCodesPagination: LocalPagination;
+  voucherCodesSettings: UseListSettings["settings"];
 }
 
 const CategoriesTab = Tab(VoucherDetailsPageTab.categories);
@@ -130,6 +151,9 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
   onTabClick,
   openChannelsModal,
   onRemove,
+  onMultipleVoucheCodesGenerate,
+  onCustomVoucherCodeGenerate,
+  onDeleteVoucherCodes,
   onSubmit,
   toggle,
   toggleAll,
@@ -139,6 +163,14 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
   categoryListToolbar,
   collectionListToolbar,
   productListToolbar,
+  selectedVoucherCodesIds,
+  onSelectVoucherCodesIds,
+  voucherCodes,
+  addedVoucherCodes,
+  voucherCodesLoading,
+  voucherCodesPagination,
+  onVoucherCodesSettingsChange,
+  voucherCodesSettings,
 }) => {
   const intl = useIntl();
   const navigate = useNavigator();
@@ -173,8 +205,9 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
     applyOncePerOrder: voucher?.applyOncePerOrder || false,
     onlyForStaff: voucher?.onlyForStaff || false,
     channelListings,
-    code: voucher?.code || "",
+    name: voucher?.name || "",
     discountType,
+    codes: addedVoucherCodes,
     endDate: splitDateTime(voucher?.endDate ?? "").date,
     endTime: splitDateTime(voucher?.endDate ?? "").time,
     hasEndDate: !!voucher?.endDate,
@@ -187,6 +220,7 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
     type: voucher?.type ?? VoucherTypeEnum.ENTIRE_ORDER,
     usageLimit: voucher?.usageLimit ?? 1,
     used: voucher?.used ?? 0,
+    singleUse: voucher?.singleUse ?? false,
     metadata: voucher?.metadata.map(mapMetadataItemToInput),
     privateMetadata: voucher?.privateMetadata.map(mapMetadataItemToInput),
   };
@@ -209,14 +243,32 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
 
         return (
           <DetailPageLayout>
-            <TopNav href={voucherListUrl()} title={voucher?.code} />
+            <TopNav href={voucherListUrl()} title={voucher?.name} />
             <DetailPageLayout.Content>
               <VoucherInfo
                 data={data}
                 disabled={disabled}
                 errors={errors}
                 onChange={change}
-                variant="update"
+              />
+              <VoucherCodes
+                selectedCodesIds={selectedVoucherCodesIds}
+                onSelectVoucherCodesIds={onSelectVoucherCodesIds}
+                onDeleteCodes={onDeleteVoucherCodes}
+                loading={voucherCodesLoading}
+                onMultiCodesGenerate={codes => {
+                  triggerChange();
+                  onMultipleVoucheCodesGenerate(codes);
+                }}
+                onCustomCodeGenerate={code => {
+                  triggerChange();
+                  onCustomVoucherCodeGenerate(code);
+                }}
+                disabled={disabled}
+                codes={voucherCodes}
+                voucherCodesPagination={voucherCodesPagination}
+                onSettingsChange={onVoucherCodesSettingsChange}
+                settings={voucherCodesSettings}
               />
               <VoucherTypes
                 data={data}
@@ -241,12 +293,14 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
                     <CategoriesTab
                       isActive={activeTab === VoucherDetailsPageTab.categories}
                       changeTab={onTabClick}
+                      testId="categories-tab"
                     >
                       {intl.formatMessage(itemsQuantityMessages.categories, {
                         quantity: tabItemsCount.categories?.toString() || "…",
                       })}
                     </CategoriesTab>
                     <CollectionsTab
+                      testId="collections-tab"
                       isActive={activeTab === VoucherDetailsPageTab.collections}
                       changeTab={onTabClick}
                     >
@@ -255,6 +309,7 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
                       })}
                     </CollectionsTab>
                     <ProductsTab
+                      testId="products-tab"
                       isActive={activeTab === VoucherDetailsPageTab.products}
                       changeTab={onTabClick}
                     >

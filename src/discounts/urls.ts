@@ -32,8 +32,8 @@ export type SaleListUrlFilters = Filters<SaleListUrlFiltersEnum> &
 export type SaleListUrlDialog = "remove" | TabActionDialog;
 export enum SaleListUrlSortField {
   name = "name",
-  endDate = "end-date",
-  startDate = "start-date",
+  endDate = "endDate",
+  startDate = "startDate",
   type = "type",
   value = "value",
 }
@@ -113,7 +113,7 @@ export type VoucherUrlDialog =
   | "remove"
   | ChannelsAction;
 export type VoucherUrlQueryParams = BulkAction & Dialog<VoucherUrlDialog>;
-export type VoucherCreateUrlQueryParams = Dialog<ChannelsAction>;
+export type VoucherCreateUrlQueryParams = Dialog<VoucherUrlDialog>;
 export const voucherUrl = (id: string, params?: VoucherUrlQueryParams) =>
   voucherPath(encodeURIComponent(id)) + "?" + stringifyQs(params);
 export const voucherAddPath = urlJoin(voucherSection, "add");

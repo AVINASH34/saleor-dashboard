@@ -19,23 +19,19 @@ export interface ProductChannelsListingsDialogProps extends DialogProps {
   onConfirm: ProductChannelsListingDialogSubmit;
 }
 
-const ProductChannelsListingsDialog: React.FC<ProductChannelsListingsDialogProps> = ({
-  channels,
-  data,
-  open,
-  onClose,
-  onConfirm,
-}) => {
+const ProductChannelsListingsDialog: React.FC<
+  ProductChannelsListingsDialogProps
+> = ({ channels, data, open, onClose, onConfirm }) => {
   const intl = useIntl();
 
   const [selected, setSelected] = useStateFromProps(
-    data.channels.updateChannels.map(listing => listing.channelId),
+    data.channels.updateChannels?.map(listing => listing.channelId) ?? [],
   );
 
   const handleConfirm = () => {
     onConfirm(
       arrayDiff(
-        data.channels.updateChannels.map(({ channelId }) => channelId),
+        data.channels.updateChannels?.map(({ channelId }) => channelId) ?? [],
         selected,
       ),
     );
@@ -62,7 +58,7 @@ const ProductChannelsListingsDialog: React.FC<ProductChannelsListingsDialogProps
         defaultMessage: "Manage Products Channel Availability",
       })}
       confirmButtonState="default"
-      selected={selected.length}
+      selected={selected?.length}
       onConfirm={handleConfirm}
     />
   );

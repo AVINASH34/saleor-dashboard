@@ -3,7 +3,7 @@ import Form from "@dashboard/components/Form";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import { IconButton } from "@dashboard/components/IconButton";
 import { getAppMountUri } from "@dashboard/config";
-import { RequestPasswordResetMutation } from "@dashboard/graphql";
+import { AccountErrorCode } from "@dashboard/graphql";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import { commonMessages } from "@dashboard/intl";
 import { TextField, Typography } from "@material-ui/core";
@@ -21,9 +21,7 @@ export interface ResetPasswordPageProps {
   error: string;
   onSubmit: (
     data: ResetPasswordPageFormData,
-  ) => SubmitPromise<
-    RequestPasswordResetMutation["requestPasswordReset"]["errors"]
-  >;
+  ) => SubmitPromise<AccountErrorCode[]>;
 }
 
 const ResetPasswordPage: React.FC<ResetPasswordPageProps> = props => {

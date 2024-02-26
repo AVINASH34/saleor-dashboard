@@ -17,7 +17,7 @@ import {
   Tooltip,
   TrashBinIcon,
   WarningIcon,
-} from "@saleor/macaw-ui/next";
+} from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -32,24 +32,29 @@ export const NotInstalledAppListRow: React.FC<AppInstallation> = props => {
 
   return (
     <List.Item
-      padding={7}
+      padding={4}
       borderTopStyle="solid"
       borderWidth={1}
-      borderColor="neutralPlain"
+      borderColor="default1"
       justifyContent="space-between"
       flexDirection="row"
       flexWrap={{ mobile: "wrap", desktop: "nowrap" }}
     >
       <Box
         display="flex"
-        gap={5}
+        gap={2}
         alignItems="center"
         justifyContent={{ mobile: "space-between", desktop: "flex-start" }}
       >
         <AppAvatar logo={logo} />
         <Text variant="bodyStrong">{appInstallation.appName}</Text>
         {isExternal && (
-          <Chip data-test-id="app-external-label" size="large">
+          <Chip
+            data-test-id="app-external-label"
+            size="large"
+            backgroundColor="default1"
+            borderColor="default1"
+          >
             <Text variant="caption" size="small">
               <FormattedMessage {...appsMessages.externalApp} />
             </Text>
@@ -75,12 +80,12 @@ export const NotInstalledAppListRow: React.FC<AppInstallation> = props => {
           <>
             <Tooltip>
               <Tooltip.Trigger>
-                <Box display="flex" placeItems="center" gap={3} marginX={3}>
-                  <WarningIcon size="small" color="iconCriticalSubdued" />
+                <Box display="flex" placeItems="center" gap={1} marginX={1}>
+                  <WarningIcon size="small" color="critical1" />
                   <Text
                     variant="caption"
                     size="small"
-                    color="textCriticalSubdued"
+                    color="critical2"
                     data-test-id="app-failed-label"
                   >
                     <FormattedMessage

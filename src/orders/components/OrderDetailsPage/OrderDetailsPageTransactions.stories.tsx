@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   GiftCardEventsEnum,
   OrderDetailsFragment,
@@ -16,7 +17,7 @@ import React from "react";
 import OrderDetailsPage, { OrderDetailsPageProps } from "./OrderDetailsPage";
 
 const props: Omit<OrderDetailsPageProps, "classes"> = {
-  disabled: false,
+  loading: false,
   onBillingAddressEdit: undefined,
   onTransactionAction: () => undefined,
   onFulfillmentApprove: () => undefined,
@@ -25,6 +26,7 @@ const props: Omit<OrderDetailsPageProps, "classes"> = {
   onInvoiceClick: () => undefined,
   onInvoiceGenerate: () => undefined,
   onInvoiceSend: () => undefined,
+  onShowMetadata: () => undefined,
   onNoteAdd: undefined,
   onOrderCancel: undefined,
   onOrderFulfill: undefined,

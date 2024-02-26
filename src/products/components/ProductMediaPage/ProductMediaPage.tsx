@@ -1,5 +1,7 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardTitle from "@dashboard/components/CardTitle";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import Grid from "@dashboard/components/Grid";
 import Savebar from "@dashboard/components/Savebar";
@@ -9,8 +11,8 @@ import useNavigator from "@dashboard/hooks/useNavigator";
 import { commonMessages } from "@dashboard/intl";
 import { productUrl } from "@dashboard/products/urls";
 import { Card, CardContent, TextField } from "@material-ui/core";
-import { ConfirmButtonTransitionState, makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { makeStyles } from "@saleor/macaw-ui";
+import { vars } from "@saleor/macaw-ui-next";
 import React from "react";
 import { defineMessages, useIntl } from "react-intl";
 
@@ -51,7 +53,7 @@ const useStyles = makeStyles(
         width: "100%",
         maxHeight: 420,
       },
-      border: `1px solid ${vars.colors.border.neutralPlain}`,
+      border: `1px solid ${vars.colors.border.default1}`,
       borderRadius: theme.spacing(),
       margin: `0 auto ${theme.spacing(2)}px`,
       width: "100%",

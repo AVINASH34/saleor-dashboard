@@ -40,7 +40,6 @@ function updateProductManageInChannel(manageSelector) {
     .get(BUTTON_SELECTORS.confirm)
     .click()
     .confirmationMessageShouldAppear()
-    .confirmationMessageShouldDisappear()
     .wait("@ProductChannelListingUpdate");
 }
 
@@ -84,7 +83,7 @@ export function fillUpAllCommonFieldsInCreateAndUpdate({
 export function fillUpProductGeneralInfo({ name, description, rating }) {
   return cy
     .get(PRODUCT_DETAILS.productNameInput)
-    .click()
+    .click({ force: true })
     .clearAndType(name)
     .get(PRODUCT_DETAILS.descriptionInput)
     .clearAndType(description)
@@ -109,7 +108,7 @@ export function fillUpProductOrganization({
 }) {
   const organization = {};
   return cy
-    .fillAutocompleteSelect(PRODUCT_DETAILS.productTypeInput, productType)
+    .fillAutocompleteSelect(PRODUCT_DETAILS.productTypeInput, productType, true)
     .then(selected => {
       organization.productType = selected;
       fillUpCollectionAndCategory({ category, collection });
@@ -124,10 +123,10 @@ export function fillUpProductOrganization({
 export function fillUpCollectionAndCategory({ category, collection }) {
   const organization = {};
   return cy
-    .fillAutocompleteSelect(PRODUCT_DETAILS.categoryInput, category)
+    .fillAutocompleteSelect(PRODUCT_DETAILS.categoryInput, category, false)
     .then(selected => {
       organization.category = selected;
-      cy.fillMultiSelect(PRODUCT_DETAILS.collectionInput, collection);
+      cy.fillNewMultiSelect(PRODUCT_DETAILS.collectionInput, collection);
     })
     .then(selected => {
       organization.collection = selected;
@@ -152,6 +151,7 @@ export function addVariantToDataGrid(variantName) {
 
 export function enterVariantEditPage() {
   cy.get(PRODUCT_DETAILS.dataGridTable)
+    .scrollIntoView()
     .should("be.visible")
     .wait(1000)
     .get(PRODUCT_DETAILS.editVariant)

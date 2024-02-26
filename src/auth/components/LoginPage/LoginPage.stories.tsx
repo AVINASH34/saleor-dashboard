@@ -15,7 +15,7 @@ const props: Omit<LoginCardProps, "classes"> = {
   loading: false,
   errors: [],
   onExternalAuthentication: () => undefined,
-  onSubmit: () => undefined,
+  onSubmit: async () => {},
 };
 
 export default {

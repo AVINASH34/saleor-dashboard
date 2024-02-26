@@ -21,7 +21,7 @@ export interface CategoryCreateFormData extends MetadataFormData {
   slug: string;
 }
 export interface CategoryCreateData extends CategoryCreateFormData {
-  description: OutputData;
+  description: OutputData | null;
 }
 
 interface CategoryCreateHandlers {
@@ -74,9 +74,8 @@ function useCategoryCreateForm(
     triggerChange,
   });
 
-  const {
-    makeChangeHandler: makeMetadataChangeHandler,
-  } = useMetadataChangeTrigger();
+  const { makeChangeHandler: makeMetadataChangeHandler } =
+    useMetadataChangeTrigger();
 
   const changeMetadata = makeMetadataChangeHandler(handleChange);
 

@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { AddressTypeInput } from "@dashboard/customers/types";
 import { AccountErrorFragment, OrderErrorFragment } from "@dashboard/graphql";
 import { commonMessages } from "@dashboard/intl";
@@ -31,8 +32,8 @@ interface AddressEditProps {
   data: AddressTypeInput;
   disabled?: boolean;
   errors: Array<AccountErrorFragment | OrderErrorFragment>;
-  onChange(event: React.ChangeEvent<any>);
-  onCountryChange(event: React.ChangeEvent<any>);
+  onChange: (event: React.ChangeEvent<any>) => any;
+  onCountryChange: (event: React.ChangeEvent<any>) => any;
 }
 
 const PossibleFormFields = {
@@ -79,6 +80,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
         <div>
           <TextField
             disabled={disabled}
+            data-test-id="first-name-input"
             error={!!formErrors.firstName}
             helperText={getErrorMessage(formErrors.firstName, intl)}
             label={intl.formatMessage(commonMessages.firstName)}
@@ -97,6 +99,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
         <div>
           <TextField
             disabled={disabled}
+            data-test-id="last-name-input"
             error={!!formErrors.lastName}
             helperText={getErrorMessage(formErrors.lastName, intl)}
             label={intl.formatMessage(commonMessages.lastName)}
@@ -115,6 +118,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
       <div className={classes.root}>
         <div>
           <TextField
+            data-test-id="company-name-input"
             disabled={disabled}
             error={!!formErrors.companyName}
             helperText={getErrorMessage(formErrors.companyName, intl)}
@@ -135,6 +139,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
         <div>
           <TextField
             disabled={disabled}
+            data-test-id="phone-input"
             error={!!formErrors.phone}
             fullWidth
             helperText={getErrorMessage(formErrors.phone, intl)}
@@ -155,6 +160,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
       <FormSpacer />
       <TextField
         disabled={disabled}
+        data-test-id="address-line-1-input"
         error={!!formErrors.streetAddress1}
         helperText={getErrorMessage(formErrors.streetAddress1, intl)}
         label={intl.formatMessage({
@@ -173,6 +179,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
       <FormSpacer />
       <TextField
         disabled={disabled}
+        data-test-id="address-line-2-input"
         error={!!formErrors.streetAddress2}
         helperText={getErrorMessage(formErrors.streetAddress2, intl)}
         label={intl.formatMessage({
@@ -193,6 +200,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
         <div>
           <TextField
             disabled={disabled}
+            data-test-id="city-input"
             error={!!formErrors.city}
             helperText={getErrorMessage(formErrors.city, intl)}
             label={intl.formatMessage({
@@ -212,6 +220,7 @@ const AddressEdit: React.FC<AddressEditProps> = props => {
         <div>
           <TextField
             disabled={disabled}
+            data-test-id="zip-input"
             error={!!formErrors.postalCode}
             label={intl.formatMessage({
               id: "oYGfnY",

@@ -1,5 +1,7 @@
+// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardTitle from "@dashboard/components/CardTitle";
+import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import Grid from "@dashboard/components/Grid";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
@@ -22,8 +24,6 @@ import { taxesMessages } from "@dashboard/taxes/messages";
 import { isLastElement } from "@dashboard/taxes/utils/utils";
 import { Card, CardContent, Divider } from "@material-ui/core";
 import {
-  Button,
-  ConfirmButtonTransitionState,
   List,
   ListHeader,
   ListItem,
@@ -31,7 +31,7 @@ import {
   PageTab,
   PageTabs,
 } from "@saleor/macaw-ui";
-import { Box } from "@saleor/macaw-ui/next";
+import { Box, Button } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -103,6 +103,11 @@ export const TaxChannelsPage: React.FC<TaxChannelsPageProps> = props => {
         taxCalculationStrategy: config.taxCalculationStrategy,
         displayGrossPrices: config.displayGrossPrices,
       }));
+    const parsedRemove: TaxConfigurationUpdateInput["removeCountriesConfiguration"] =
+      removeCountriesConfiguration.filter(
+        configId =>
+          !parsedUpdate.some(config => config.countryCode === configId),
+      );
     onSubmit({
       chargeTaxes: data.chargeTaxes,
       taxCalculationStrategy: data.chargeTaxes
@@ -111,7 +116,7 @@ export const TaxChannelsPage: React.FC<TaxChannelsPageProps> = props => {
       displayGrossPrices: data.displayGrossPrices,
       pricesEnteredWithTax: data.pricesEnteredWithTax,
       updateCountriesConfiguration: parsedUpdate,
-      removeCountriesConfiguration,
+      removeCountriesConfiguration: parsedRemove,
     });
   };
 
@@ -161,21 +166,24 @@ export const TaxChannelsPage: React.FC<TaxChannelsPageProps> = props => {
 
         return (
           <DetailPageLayout gridTemplateColumns={1}>
-            <TopNav title={<TaxPageTitle />} />
+            <TopNav title={<TaxPageTitle />} href={configurationMenuUrl} />
             <DetailPageLayout.Content>
-              <Box padding={9}>
+              <Box padding={6}>
                 <PageTabs value="channels" onChange={handleTabChange}>
                   <PageTab
                     label={intl.formatMessage(taxesMessages.channelsSection)}
                     value="channels"
+                    data-test-id="channels-tab"
                   />
                   <PageTab
                     label={intl.formatMessage(taxesMessages.countriesSection)}
                     value="countries"
+                    data-test-id="countries-tab"
                   />
                   <PageTab
                     label={intl.formatMessage(taxesMessages.taxClassesSection)}
                     value="tax-classes"
+                    data-test-id="tax-classes-tab"
                   />
                 </PageTabs>
                 <VerticalSpacer spacing={2} />
@@ -201,6 +209,7 @@ export const TaxChannelsPage: React.FC<TaxChannelsPageProps> = props => {
                         )}
                         toolbar={
                           <Button
+                            data-test-id="add-country-button"
                             variant="secondary"
                             onClick={() => openDialog("add-country")}
                           >

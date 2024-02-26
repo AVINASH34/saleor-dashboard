@@ -1,5 +1,5 @@
 import { makeStyles } from "@saleor/macaw-ui";
-import { vars } from "@saleor/macaw-ui/next";
+import { vars } from "@saleor/macaw-ui-next";
 
 export const useStyles = makeStyles(
   theme => ({
@@ -16,8 +16,8 @@ export const useStyles = makeStyles(
     },
     root: {
       marginTop: theme.spacing(4),
-      paddingRight: vars.space[9],
-      paddingLeft: vars.space[9],
+      paddingRight: vars.spacing[6],
+      paddingLeft: vars.spacing[6],
     },
     user: {
       marginBottom: theme.spacing(1),

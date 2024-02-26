@@ -25,7 +25,7 @@ export interface CategoryUpdateFormData extends MetadataFormData {
   seoDescription: string;
 }
 export interface CategoryUpdateData extends CategoryUpdateFormData {
-  description: OutputData;
+  description: OutputData | null;
 }
 
 interface CategoryUpdateHandlers {
@@ -39,12 +39,14 @@ export interface UseCategoryUpdateFormResult
 
 export interface CategoryUpdateFormProps {
   children: (props: UseCategoryUpdateFormResult) => React.ReactNode;
-  category: CategoryDetailsFragment;
+  category: CategoryDetailsFragment | undefined | null;
   onSubmit: (data: CategoryUpdateData) => Promise<any[]>;
   disabled: boolean;
 }
 
-const getInitialData = (category?: CategoryDetailsFragment) => ({
+const getInitialData = (
+  category: CategoryDetailsFragment | undefined | null,
+) => ({
   backgroundImageAlt: category?.backgroundImage?.alt || "",
   metadata: category?.metadata?.map(mapMetadataItemToInput),
   name: category?.name || "",
@@ -55,7 +57,7 @@ const getInitialData = (category?: CategoryDetailsFragment) => ({
 });
 
 function useCategoryUpdateForm(
-  category: CategoryDetailsFragment,
+  category: CategoryDetailsFragment | undefined | null,
   onSubmit: (data: CategoryUpdateData) => Promise<any[]>,
   disabled: boolean,
 ): UseCategoryUpdateFormResult & { richText: RichTextContextValues } {
@@ -90,21 +92,23 @@ function useCategoryUpdateForm(
 
   const changeMetadata = makeMetadataChangeHandler(handleChange);
 
-  const data: CategoryUpdateData = {
+  const data = {
     ...formData,
     description: null,
-  };
+  } as CategoryUpdateData;
 
   // Need to make it function to always have description.current up to date
-  const getData = async (): Promise<CategoryUpdateData> => ({
-    ...formData,
-    description: await richText.getValue(),
-  });
+  const getData = async (): Promise<CategoryUpdateData> =>
+    ({
+      ...formData,
+      description: await richText.getValue(),
+    } as CategoryUpdateData);
 
-  const getSubmitData = async (): Promise<CategoryUpdateData> => ({
-    ...(await getData()),
-    ...getMetadata(data, isMetadataModified, isPrivateMetadataModified),
-  });
+  const getSubmitData = async (): Promise<CategoryUpdateData> =>
+    ({
+      ...(await getData()),
+      ...getMetadata(data, isMetadataModified, isPrivateMetadataModified),
+    } as CategoryUpdateData);
 
   const submit = async () => handleFormSubmit(await getSubmitData());
 
@@ -131,7 +135,7 @@ const CategoryUpdateForm: React.FC<CategoryUpdateFormProps> = ({
   disabled,
 }) => {
   const { richText, ...props } = useCategoryUpdateForm(
-    category,
+    category!,
     onSubmit,
     disabled,
   );

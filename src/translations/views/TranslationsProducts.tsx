@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import {
   LanguageCodeEnum,
   useProductTranslationDetailsQuery,
@@ -20,6 +21,8 @@ import {
   getAttributeValueTranslationsInputData,
   getParsedTranslationInputData,
 } from "../utils";
+
+type HandleSubmitAttributeValue = OutputData | string;
 
 export interface TranslationsProductsQueryParams {
   activeField: string;
@@ -55,18 +58,15 @@ const TranslationsProducts: React.FC<TranslationsProductsProps> = ({
     }
   };
 
-  const [
-    updateTranslations,
-    updateTranslationsOpts,
-  ] = useUpdateProductTranslationsMutation({
-    onCompleted: data => onUpdate(data.productTranslate.errors),
-  });
+  const [updateTranslations, updateTranslationsOpts] =
+    useUpdateProductTranslationsMutation({
+      onCompleted: data => onUpdate(data.productTranslate.errors),
+    });
 
-  const [
-    updateAttributeValueTranslations,
-  ] = useUpdateAttributeValueTranslationsMutation({
-    onCompleted: data => onUpdate(data.attributeValueTranslate.errors),
-  });
+  const [updateAttributeValueTranslations] =
+    useUpdateAttributeValueTranslationsMutation({
+      onCompleted: data => onUpdate(data.attributeValueTranslate.errors),
+    });
 
   const onEdit = (field: string) =>
     navigate(
@@ -100,7 +100,7 @@ const TranslationsProducts: React.FC<TranslationsProductsProps> = ({
 
   const handleAttributeValueSubmit = (
     { id, type }: TranslationField<TranslationInputFieldName>,
-    data: OutputData | string,
+    data: HandleSubmitAttributeValue,
   ) =>
     extractMutationErrors(
       updateAttributeValueTranslations({

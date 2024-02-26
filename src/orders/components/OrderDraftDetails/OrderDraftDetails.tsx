@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
 import {
@@ -22,20 +23,24 @@ interface OrderDraftDetailsProps {
   order: OrderDetailsFragment;
   channelUsabilityData?: ChannelUsabilityDataQuery;
   errors: OrderErrorFragment[];
+  loading: boolean;
   onOrderLineAdd: () => void;
   onOrderLineChange: (id: string, data: OrderLineInput) => void;
   onOrderLineRemove: (id: string) => void;
   onShippingMethodEdit: () => void;
+  onShowMetadata: (id: string) => void;
 }
 
 const OrderDraftDetails: React.FC<OrderDraftDetailsProps> = ({
   order,
   channelUsabilityData,
   errors,
+  loading,
   onOrderLineAdd,
   onOrderLineChange,
   onOrderLineRemove,
   onShippingMethodEdit,
+  onShowMetadata,
 }) => {
   const intl = useIntl();
 
@@ -70,8 +75,10 @@ const OrderDraftDetails: React.FC<OrderDraftDetailsProps> = ({
       <OrderDraftDetailsProducts
         order={order}
         errors={errors}
+        loading={loading}
         onOrderLineChange={onOrderLineChange}
         onOrderLineRemove={onOrderLineRemove}
+        onShowMetadata={onShowMetadata}
       />
       {maybe(() => order.lines.length) !== 0 && (
         <CardContent>

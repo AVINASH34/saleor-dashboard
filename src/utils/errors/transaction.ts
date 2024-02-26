@@ -36,8 +36,10 @@ export function getOrderTransactionErrorMessage(
         return intl.formatMessage(transactionRequestMessages.notFound);
     }
 
-    return getCommonFormFieldErrorMessage(err, intl);
+    return getCommonFormFieldErrorMessage(err, intl) || "";
   }
+
+  return "";
 }
 
 export const transactionCreateMessages = defineMessages({
@@ -73,6 +75,8 @@ export function getTransactionCreateErrorMessage(
         return intl.formatMessage(transactionCreateMessages.incorrectCurrency);
     }
 
-    return getCommonFormFieldErrorMessage(err, intl);
+    return getCommonFormFieldErrorMessage(err, intl) || "";
   }
+
+  return "";
 }

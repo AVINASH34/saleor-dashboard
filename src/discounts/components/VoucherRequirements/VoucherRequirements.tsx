@@ -1,3 +1,4 @@
+// @ts-strict-ignore
 import CardTitle from "@dashboard/components/CardTitle";
 import { FormSpacer } from "@dashboard/components/FormSpacer";
 import PriceField from "@dashboard/components/PriceField";
@@ -81,7 +82,7 @@ const VoucherRequirements = ({
   ];
 
   return (
-    <Card>
+    <Card data-test-id="minimum-requirements-section">
       <CardTitle
         title={intl.formatMessage({
           id: "yhv3HX",
@@ -102,12 +103,6 @@ const VoucherRequirements = ({
         ) && <FormSpacer />}
         {data.requirementsPicker === RequirementsPicker.ORDER ? (
           <>
-            <Typography variant="caption">
-              <FormattedMessage
-                id="K+ROF8"
-                defaultMessage="Channels that don’t have assigned discounts will use their parent channel to define the price. Price will be converted to channel’s currency"
-              />
-            </Typography>
             <div className={classes.tableContainer}>
               <ResponsiveTable className={classes.table}>
                 <TableHead
@@ -142,7 +137,10 @@ const VoucherRequirements = ({
                         id => id === listing.id,
                       );
                       return (
-                        <TableRowLink key={listing?.id || `skeleton-${index}`}>
+                        <TableRowLink
+                          key={listing?.id || `skeleton-${index}`}
+                          data-test-id={listing?.name}
+                        >
                           <TableCell>
                             <Typography>
                               {listing?.name || <Skeleton />}
@@ -194,6 +192,7 @@ const VoucherRequirements = ({
           </>
         ) : data.requirementsPicker === RequirementsPicker.ITEM ? (
           <TextField
+            data-test-id="minimum-quantity-of-items-input"
             disabled={disabled}
             error={!!formErrors.minCheckoutItemsQuantity}
             helperText={getDiscountErrorMessage(

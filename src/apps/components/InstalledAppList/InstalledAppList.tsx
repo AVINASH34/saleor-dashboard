@@ -1,7 +1,7 @@
 import { AppInstallation, InstalledApp } from "@dashboard/apps/types";
 import { ListProps } from "@dashboard/types";
 import { Skeleton } from "@material-ui/lab";
-import { List } from "@saleor/macaw-ui/next";
+import { List } from "@saleor/macaw-ui-next";
 import React from "react";
 
 import InstalledAppListRow from "../InstalledAppListRow";
@@ -27,7 +27,11 @@ const InstalledAppList: React.FC<InstalledAppListProps> = ({
           key={appInstallation.id}
           appInstallation={appInstallation}
           isExternal={isExternal}
-          logo={logo}
+          logo={
+            appInstallation.brand?.logo.default
+              ? { source: appInstallation.brand.logo.default }
+              : logo
+          }
         />
       ))}
       {appList.map(({ app, isExternal, logo }) => (
@@ -35,7 +39,9 @@ const InstalledAppList: React.FC<InstalledAppListProps> = ({
           key={app.id}
           app={app}
           isExternal={isExternal}
-          logo={logo}
+          logo={
+            app.brand?.logo.default ? { source: app.brand?.logo.default } : logo
+          }
         />
       ))}
     </List>
