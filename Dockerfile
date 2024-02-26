@@ -1,11 +1,11 @@
-FROM gcr.io/distroless/nodejs20@sha256:635aea24f34bc83c9c0907b0b64922d18c4ddd74b330ae0909aba00f96947689 as build
+FROM gcr.io/distroless/nodejs20@sha256:835710e48978ebad01dabc5182e8847f11e9aa0d0e1a703792efe396aaee3c67 as build
 RUN mkdir /temp
 COPY . /temp
 WORKDIR /temp
 RUN npm install 
 
 
-FROM gcr.io/distroless/nodejs20@sha256:635aea24f34bc83c9c0907b0b64922d18c4ddd74b330ae0909aba00f96947689 as final
+FROM gcr.io/distroless/nodejs20@sha256:835710e48978ebad01dabc5182e8847f11e9aa0d0e1a703792efe396aaee3c67 as final
 COPY --from=build /temp /temp
 WORKDIR /temp
 EXPOSE 9000
